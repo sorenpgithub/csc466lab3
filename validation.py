@@ -16,3 +16,14 @@ if sys.argv[3] == -1:
     allbutone = True
 elif sys.argv == 0:
     nocross = True
+
+
+def cross_val(df, k):
+    shuffled_df = df.sample(frac=1)
+    folds = np.array_split(shuffled_df, k) #k folds for cross validation
+
+    for fold in folds: 
+        test
+
+    
+    
