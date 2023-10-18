@@ -27,16 +27,16 @@ if len(sys.argv) == 1:
   exit()
 
 path = sys.argv[1]
-print(path)
+#print(path)
 ret = parser(path)
 D = ret[0]
 class_var = ret[1]
 
 categ_vars = list(D.columns)
-print(class_var, categ_vars)
+#print(class_var, categ_vars)
 
 categ_vars.remove(class_var)
-print(class_var, categ_vars)
+#print(class_var, categ_vars)
 #D.head()
 
 #replace with string in 3rd row of CSV WILL BE GLOBAL
