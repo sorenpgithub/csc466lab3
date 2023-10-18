@@ -33,36 +33,44 @@ class_var = ret[1]
 D =  ret[0]
 df_A = D.drop(class_var, axis = 1) #drops class variable without c
 
-
+print(df_A.shape[0])
 def generate_preds(df_A, tree):
-  leaf = False
   pred = []
   correct = 0
   for index, row in df_A.iterrows(): #row is series object, val accessed like dict
+    leaf = False
     curr_node = tree["node"] #{"var":123: "edges":[....]}
-    A_i = curr_node["var"] 
-    obs_val = row[A_i] #value of observation in variable, A_i = # of bedroom \implies obs_val = 3
-    print(A_i, obs_val)
+    #print(curr_node)
 
     while not leaf:
+      #print("top loop", curr_node)
+      A_i = curr_node["var"] 
+      obs_val = row[A_i] #value of observation in variable, A_i = # of bedroom \implies obs_val = 3
+      #print(A_i, obs_val)
       for edg in curr_node["edges"]: #list of edges | edg = {"edge":{"value"}}
         curr_edge = edg["edge"]
+        #print("current edge", curr_edge)
+        #print(curr_edge["value"], obs_val)
         if curr_edge["value"] == obs_val: 
           if "node" in curr_edge:
-            curr_node = curr_edge["node"] #scary since it changes list mid-iteration possibly bugs
+            curr_node = curr_edge["node"] #updating new node
+            #print("changed", curr_node)
           else: #must be a leaf
+            #print("in leaf statement")
             pred_val = curr_edge["leaf"]["decision"]
             if not silent:
-              print([row])
+              txt = "Row Id: {0} | Indicators: {1} | Pred: {2}".format(index, str(list(row)), pred_val)
+              print(txt) #change from index to unique row_ids
+            
             pred.append(pred_val)
             if training and D[class_var].iloc[index] == pred_val:
                 correct += 1
             leaf = True
-          print("found same obs val")
+          #print("found correct obs val")
           break
-
-      print("broken")
-      break
+      #very very scary, always assumes there is edge with value
+      #print("broken")
+      #break
   return (pred, correct)
 
 def output_stuff(preds, correct):
