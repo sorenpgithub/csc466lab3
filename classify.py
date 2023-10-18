@@ -42,6 +42,8 @@ def generate_preds(df_A, tree):
     curr_node = tree["node"] #{"var":123: "edges":[....]}
     A_i = curr_node["var"] 
     obs_val = row[A_i] #value of observation in variable, A_i = # of bedroom \implies obs_val = 3
+    print(A_i, obs_val)
+
     while not leaf:
       for edg in curr_node["edges"]: #list of edges | edg = {"edge":{"value"}}
         curr_edge = edg["edge"]
@@ -50,12 +52,17 @@ def generate_preds(df_A, tree):
             curr_node = curr_edge["node"] #scary since it changes list mid-iteration possibly bugs
           else: #must be a leaf
             pred_val = curr_edge["leaf"]["decision"]
-            print([row])
+            if not silent:
+              print([row])
             pred.append(pred_val)
             if training and D[class_var].iloc[index] == pred_val:
                 correct += 1
             leaf = True
-          break 
+          print("found same obs val")
+          break
+
+      print("broken")
+      break
   return (pred, correct)
 
 def output_stuff(preds, correct):
@@ -65,22 +72,23 @@ def output_stuff(preds, correct):
   not_correct = len(preds) - correct
   accu_rate = correct / len(preds)
   df_confusion = pd.crosstab(y_actu, y_pred, rownames=['Actual'], colnames=['Predicted'], margins=True)
-  output.append("Total number of records classified:", len(preds)) #total number of records classified
-  output.append("Total number of records correctly classified:", correct)
-  output.append("Total number of records incorrectly classified:", not_correct)
-  output.append("Overall Accuracy:", accu_rate)
-  output.append("Overall Error Rate:", 1 - accu_rate)
-  output.append(df_confusion)
+  output.append("Total number of records classified:"  + str(len(preds))) #total number of records classified
+  output.append("Total number of records correctly classified:" + str(correct))
+  output.append("Total number of records incorrectly classified:" + str(not_correct))
+  output.append("Overall Accuracy:" + str(accu_rate))
+  output.append("Overall Error Rate:" + str(1 - accu_rate))
+  output.append(df_confusion.to_string())
+  return output
 
 
 
-print(df_A.columns())
-res = generate_preds(df_A, tree)
+print(df_A.columns)
+res = generate_preds(df_A, tree) #check if first node is leaf before calling!
 preds = res[0]
 correct = res[1]
 outs = output_stuff(preds, correct)
 for out in outs:
-  sys.stdout.write(out)
+  sys.stdout.write(out + "\n")
 
 
 

@@ -134,3 +134,12 @@ out = {"dataset":path} #be careful if using path
 out.update(tree)
 json_obj =  json.dumps(out, indent = 4)#should work
 sys.stdout.write(json_obj) #might not work
+
+write = True
+if write:
+  file_path = path.split(".")[0] + "_tree.json"
+
+  # Open the file in write mode
+  with open(file_path, 'w') as json_file:
+      # Write the data to the file
+      json.dump(tree, json_file)
