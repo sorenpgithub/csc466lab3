@@ -2,8 +2,7 @@ import pandas as pd
 import numpy as np
 import sys
 import json
-#InduceC45  <TrainingSetFile.csv> [<restrictionsFile>]
-print("hello world")
+#InduceC45  <TrainingSetFile.csv> [<restrictionsFile>] write
 #Basic parser
 def parser(filename):
   with open(filename, 'r') as file:
@@ -21,23 +20,30 @@ def parser(filename):
   df_A = pd.read_csv(filename, usecols=cols, names=cols, skiprows=3) #creates a dataframe
 
   return (df_A, class_name)
+rest_file = None
+write = False
+if len(sys.argv) >= 3:
+  if sys.argv[2] != "n":
+    rest_file = sys.argv[2]
+  if len(sys.argv) >= 4 and sys.argv[3] == "write":
+    write = True
 
-if len(sys.argv) == 1:
-  print("Requires TrainingSet.csv")
-  exit()
+  
+
 
 path = sys.argv[1]
 #print(path)
 ret = parser(path)
 D = ret[0]
 class_var = ret[1]
-
 categ_vars = list(D.columns)
 #print(class_var, categ_vars)
 
 categ_vars.remove(class_var)
 #print(class_var, categ_vars)
 #D.head()
+
+
 
 #replace with string in 3rd row of CSV WILL BE GLOBAL
  #list of categorical variables
@@ -76,6 +82,7 @@ def enthropy_att(A_i, D):
     sum += (foo/bar) * enthropy(D_j)
   return sum
 
+
 def c45(D, A, threshold): #going to do pandas approach, assume D is df and A is list of col names
   if D[class_var].nunique() == 1:
     c = find_freqlab(D) #should be whatever datatype c_i is
@@ -109,8 +116,10 @@ def c45(D, A, threshold): #going to do pandas approach, assume D is df and A is 
     for v in D[A_g].unique(): #terate over each unique value (Domain) of attribute (South, West..)
       D_v = D[D[A_g] == v] #dataframe with where attribute equals value
       if not D_v.empty: #true if D_v \neq \emptyset
+        #test
         A_temp = A.copy()
         A_temp.remove(A_g)
+        #print(A_temp)
         T_v = c45(D_v, A_temp, threshold)
         temp = {"edge":{"value":v}}
         #modify to contain edge value, look at lec06 example
@@ -135,7 +144,6 @@ out.update(tree)
 json_obj =  json.dumps(out, indent = 4)#should work
 sys.stdout.write(json_obj) #might not work
 
-write = True
 if write:
   file_path = path.split(".")[0] + "_tree.json"
 

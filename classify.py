@@ -2,9 +2,11 @@ import sys
 import pandas as pd
 import json
 
-#classify.py CSVfile.csv tree.json False
+#classify.py CSVfile.csv tree.json silent
 training = True
 silent = False #make argument in thing
+if len(sys.argv) == 4:
+  silent = sys.argv[3] == "silent"
 def parser_check(filename): 
   with open(filename, 'r') as file:
     line1 = file.readline()
@@ -58,6 +60,7 @@ def generate_preds(df_A, tree):
           else: #must be a leaf
             #print("in leaf statement")
             pred_val = curr_edge["leaf"]["decision"]
+            
             if not silent:
               txt = "Row Id: {0} | Indicators: {1} | Pred: {2}".format(index, str(list(row)), pred_val)
               print(txt) #change from index to unique row_ids
