@@ -35,6 +35,7 @@ def cross_val(df, k, class_var):
     threshold = 0.1 #change
     dfs = []
     conf_matrix = pd.DataFrame() #define correct dimensions!!!!!!!
+    
     for fold in folds:
         test = df.iloc[fold]
         train = df.iloc[-fold]

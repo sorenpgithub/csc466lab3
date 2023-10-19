@@ -3,10 +3,7 @@ import pandas as pd
 import json
 
 #classify.py CSVfile.csv tree.json silent
-training = True
-silent = False #make argument in thing
-if len(sys.argv) == 4:
-  silent = sys.argv[3] == "silent"
+
 def parser_check(filename): 
   with open(filename, 'r') as file:
     line1 = file.readline()
@@ -23,17 +20,6 @@ def parser_check(filename):
   df_A = pd.read_csv(filename, usecols=cols, names=cols, skiprows=3) #creates a dataframe
 
   return (df_A, class_name)
-
-
-with open(sys.argv[2]) as json_file: #turns json back into python dict
-    tree = json.load(json_file)
-
-#initializing stuff
-#check if first element is leaf
-ret = parser_check(sys.argv[1])
-class_var = ret[1]
-D =  ret[0]
-df_A = D.drop(class_var, axis = 1) #drops class variable without c
 
 #print(df_A.shape[0])
 def generate_preds(df_A, tree):
@@ -66,7 +52,7 @@ def generate_preds(df_A, tree):
               print(txt) #change from index to unique row_ids
             
             pred.append(pred_val)
-            if training and D[class_var].iloc[index] == pred_val:
+            if is_training_csv and D[class_var].iloc[index] == pred_val:
                 correct += 1
             leaf = True
           #print("found correct obs val")
@@ -91,23 +77,38 @@ def output_stuff(preds, correct):
   output.append(df_confusion.to_string())
   return output
 
-def foobar(df, tree, class_var_t):
-  global class_var
-  global training
-  training = False #this is gonna be a bug!
-  class_var = class_var_t
-  df_A = df.drop(class_var_t, axis = 1)
-  return generate_preds(df_A, tree) #tuple of list of predictions and # correct
+def initialize_global(D_in, class_var_in, training_in, silent_in): #D_in is
+  global D, class_var, is_training_csv, silent
+  D = D_in #Dataframe with all observations, currently assuming is training set
+  class_var = class_var_in #string of colname of observed vals, could be None if not training
+  is_training_csv = training_in #tbd on slack response
+  silent = silent_in #if each classification prints
+#should be able to directly call generate_preds after initializing
 
-print(df_A.columns)
-res = generate_preds(df_A, tree) #check if first node is leaf before calling!
-preds = res[0]
-correct = res[1]
-outs = output_stuff(preds, correct)
-for out in outs:
-  sys.stdout.write(out + "\n")
+def main():
+  with open(sys.argv[2]) as json_file: #turns json back into python dict
+    tree = json.load(json_file)
+  if len(sys.argv) == 4:
+    silent_out = (sys.argv[3] == "silent")
+     
+  #initializing stuff
+  #check if first element is leaf
+  ret = parser_check(sys.argv[1])
+ 
+  
+  initialize_global(ret[0], ret[1])
+  df_A = D.drop(class_var, axis = 1) #drops class variable without c
+  res = generate_preds(df_A, tree) #check if first node is leaf before calling!
+  preds = res[0]
+  correct = res[1]
+  outs = output_stuff(preds, correct)
+  for out in outs:
+    sys.stdout.write(out + "\n")
 
 
+
+if __name__ == "__main__":
+   main()
 
 
 

@@ -119,46 +119,44 @@ def get_tree(D, categ_vars, thresh):
   tree = c45(D, categ_vars, thresh)
   return tree
 
-def foobar(D, class_var_in, thresh):
-  global class_var #remove??
-  class_var = class_var_in
-  categ_vars = list(D.columns)
-  #print(class_var, categ_vars)
-  categ_vars.remove(class_var)
-  return get_tree(D, categ_vars, thresh)
- 
+def initialize_global(path_file_in, rest_file_in, write_in = False):
+  global path, rest_file, write, thresh, D, class_var
+  path = path_file_in
+  rest_file = rest_file_in
+  write = write_in
+   #determine best value
+  ret = parser(path_file_in, rest_file_in)
+  D = ret[0]
+  class_var = ret[1]
+  
 
 def main():
-  rest_file = None
+  #runs from command line
   write = False
+  path_file = sys.argv[1]
   if len(sys.argv) >= 3:
     if sys.argv[2] != "n":
       rest_file = sys.argv[2]
     if len(sys.argv) >= 4 and sys.argv[3] == "write":
       write = True
-  thresh = 0.01 #determine best value
-  path = sys.argv[1]
-  #print(path)
-  ret = parser(path, rest_file)
-  D = ret[0]
+  initialize_global(path_file, rest_file, write)
   
-  global class_var 
-  class_var = ret[1]
-  categ_vars = list(D.columns)
-  #print(class_var, categ_vars)
-
-  categ_vars.remove(class_var)
-  #print(class_var, categ_vars)
-  #D.head()
+  
+  
+  thresh = 0.01 #determine best value
+  categ_vars = list(D.columns).remove(class_var)
   tree = get_tree(D, categ_vars, thresh)
+  
+  
   out = {"dataset":path} #be careful if using path
   out.update(tree)
+  
+  
   json_obj =  json.dumps(out, indent = 4)#should work
   sys.stdout.write(json_obj) #might not work
 
   if write:
     file_path = path.split(".")[0] + "_tree.json"
-
     # Open the file in write mode
     with open(file_path, 'w') as json_file:
         # Write the data to the file
