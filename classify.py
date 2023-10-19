@@ -35,7 +35,7 @@ class_var = ret[1]
 D =  ret[0]
 df_A = D.drop(class_var, axis = 1) #drops class variable without c
 
-print(df_A.shape[0])
+#print(df_A.shape[0])
 def generate_preds(df_A, tree):
   pred = []
   correct = 0
@@ -91,7 +91,13 @@ def output_stuff(preds, correct):
   output.append(df_confusion.to_string())
   return output
 
-
+def foobar(df, tree, class_var_t):
+  global class_var
+  global training
+  training = False #this is gonna be a bug!
+  class_var = class_var_t
+  df_A = df.drop(class_var_t, axis = 1)
+  return generate_preds(df_A, tree) #tuple of list of predictions and # correct
 
 print(df_A.columns)
 res = generate_preds(df_A, tree) #check if first node is leaf before calling!

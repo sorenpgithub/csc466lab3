@@ -2,6 +2,8 @@ import sys
 import pandas as pd
 import json
 import numpy as np
+import classify
+import InduceC45
 
 allbutone = False
 nocross = False
@@ -9,39 +11,47 @@ nocross = False
 #validation.py TrainingFile.csv restrictions.txt n
 # which will take as input the training file, the optional restrictions file and an integer number n
 
-def parser(filename):
-    with open(filename, 'r') as file:
-        line1 = file.readline()
-        line2 = file.readline()
-        line3 = file.readline() #3 lines are special, check doc
+#INIT
+n = 5
+if len(sys.argv) >= 3: 
+    if sys.argv[2] != "na":
+        restfile = sys.argv[2]
+    if len(sys.argv) == 4:
+        n = int(sys.argv[3])
+ret = InduceC45.parser(sys.argv[1])
+D = ret[0]
+class_var = ret[1]
 
-    cols = line1.split(',')
-    cols = [col.strip() for col in cols] #gets rid of white space and \n in col names
-    for i in range(len(line2)):
-        if line2[i] == '-1':
-          cols.pop(i)
 
-  class_name = str(line3).strip()
-  df_A = pd.read_csv(filename, usecols=cols, names=cols, skiprows=3) #creates a dataframe
-
-def cross_val(df, k):
-    shuffled_df = df.sample(frac=1)
-    folds = np.array_split(shuffled_df, k) #k folds for cross validation
-
-    for i in range(k): 
-        test = folds[i]
-        train = pd.concat([folds[j] for j in range(k) if j != i], ignore_index=True)
-
+def cross_val(df, k, class_var):
+    
+    indices = np.arrange(df.shape[0])
+    if n == -1:
+        allbutone = True
+    elif n == 0:
+        nocross = True #FIXXXXXXXXXXXX
+    else:
+        folds = np.array_split(indices, k) #k folds for cross validation
+    threshold = 0.1 #change
+    dfs = []
+    conf_matrix = pd.DataFrame() #define correct dimensions!!!!!!!
+    for fold in folds:
+        test = df.iloc[fold]
+        train = df.iloc[-fold]
+        tree =  InduceC45.foobar(train, class_var, threshold) #returns dict tree
+        predictions = classify.generate_preds(test, class_var, tree)[0] #returns
+        y_pred = pd.Series(predictions)
+        y_actu = test[class_var]
+        df_confusion = pd.crosstab(y_actu, y_pred, rownames=['Actual'], colnames=['Predicted'], margins=True)
+        dfs.append(df_confusion)
         #train the model
-        
-        accuracy =
+    for temp in dfs: #in theory adds together matrices
+        conf_matrix = conf_matrix + temp
 
 
-if sys.argv[3] == -1:
-    allbutone = True
-elif sys.argv == 0:
-    nocross = True
-else:
+
+
+
 
     
     

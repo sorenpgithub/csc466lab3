@@ -4,7 +4,7 @@ import sys
 import json
 #InduceC45  <TrainingSetFile.csv> [<restrictionsFile>] write
 #Basic parser
-def parser(filename):
+def parser(filename,restfile):
   with open(filename, 'r') as file:
     line1 = file.readline()
     line2 = file.readline()
@@ -20,30 +20,6 @@ def parser(filename):
   df_A = pd.read_csv(filename, usecols=cols, names=cols, skiprows=3) #creates a dataframe
 
   return (df_A, class_name)
-rest_file = None
-write = False
-if len(sys.argv) >= 3:
-  if sys.argv[2] != "n":
-    rest_file = sys.argv[2]
-  if len(sys.argv) >= 4 and sys.argv[3] == "write":
-    write = True
-
-  
-
-
-path = sys.argv[1]
-#print(path)
-ret = parser(path)
-D = ret[0]
-class_var = ret[1]
-categ_vars = list(D.columns)
-#print(class_var, categ_vars)
-
-categ_vars.remove(class_var)
-#print(class_var, categ_vars)
-#D.head()
-
-
 
 #replace with string in 3rd row of CSV WILL BE GLOBAL
  #list of categorical variables
@@ -137,17 +113,58 @@ def c45(D, A, threshold): #going to do pandas approach, assume D is df and A is 
   return T
 #NEED TO ADD P TO LEAFS
 #could use pandas?
-thresh = 0.01 #determine best value
-tree = c45(D, categ_vars, thresh) #
-out = {"dataset":path} #be careful if using path
-out.update(tree)
-json_obj =  json.dumps(out, indent = 4)#should work
-sys.stdout.write(json_obj) #might not work
 
-if write:
-  file_path = path.split(".")[0] + "_tree.json"
 
-  # Open the file in write mode
-  with open(file_path, 'w') as json_file:
-      # Write the data to the file
-      json.dump(tree, json_file)
+def get_tree(D, categ_vars, thresh):
+  tree = c45(D, categ_vars, thresh)
+  return tree
+
+def foobar(D, class_var_in, thresh):
+  global class_var #remove??
+  class_var = class_var_in
+  categ_vars = list(D.columns)
+  #print(class_var, categ_vars)
+  categ_vars.remove(class_var)
+  return get_tree(D, categ_vars, thresh)
+ 
+
+def main():
+  rest_file = None
+  write = False
+  if len(sys.argv) >= 3:
+    if sys.argv[2] != "n":
+      rest_file = sys.argv[2]
+    if len(sys.argv) >= 4 and sys.argv[3] == "write":
+      write = True
+  thresh = 0.01 #determine best value
+  path = sys.argv[1]
+  #print(path)
+  ret = parser(path, rest_file)
+  D = ret[0]
+  
+  global class_var 
+  class_var = ret[1]
+  categ_vars = list(D.columns)
+  #print(class_var, categ_vars)
+
+  categ_vars.remove(class_var)
+  #print(class_var, categ_vars)
+  #D.head()
+  tree = get_tree(D, categ_vars, thresh)
+  out = {"dataset":path} #be careful if using path
+  out.update(tree)
+  json_obj =  json.dumps(out, indent = 4)#should work
+  sys.stdout.write(json_obj) #might not work
+
+  if write:
+    file_path = path.split(".")[0] + "_tree.json"
+
+    # Open the file in write mode
+    with open(file_path, 'w') as json_file:
+        # Write the data to the file
+        json.dump(tree, json_file)
+
+
+
+if __name__ == "__main__":
+   main()
