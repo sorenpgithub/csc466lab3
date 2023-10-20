@@ -34,8 +34,9 @@ def cross_val(df, k, class_var):
         folds = np.array_split(indices, k) #k folds for cross validation
     threshold = 0.1 #change
     dfs = []
-    conf_matrix = pd.DataFrame() #define correct dimensions!!!!!!!
-    
+    dim = df["class_var"].nunique()
+    conf_matrix = pd.DataFrame(nrow = dim + 1, ncol = dim + 1) #define correct dimensions!!!!!!!
+
     for fold in folds:
         test = df.iloc[fold]
         train = df.iloc[-fold]

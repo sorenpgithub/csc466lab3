@@ -77,7 +77,7 @@ def output_stuff(preds, correct):
   output.append(df_confusion.to_string())
   return output
 
-def initialize_global(D_in, class_var_in, training_in, silent_in): #D_in is
+def initialize_global(D_in, class_var_in, training_in, silent_in = True): #D_in is
   global D, class_var, is_training_csv, silent
   D = D_in #Dataframe with all observations, currently assuming is training set
   class_var = class_var_in #string of colname of observed vals, could be None if not training
@@ -86,6 +86,7 @@ def initialize_global(D_in, class_var_in, training_in, silent_in): #D_in is
 #should be able to directly call generate_preds after initializing
 
 def main():
+  silent_out = False
   with open(sys.argv[2]) as json_file: #turns json back into python dict
     tree = json.load(json_file)
   if len(sys.argv) == 4:
@@ -94,9 +95,7 @@ def main():
   #initializing stuff
   #check if first element is leaf
   ret = parser_check(sys.argv[1])
- 
-  
-  initialize_global(ret[0], ret[1])
+  initialize_global(ret[0], ret[1], True, silent_out)
   df_A = D.drop(class_var, axis = 1) #drops class variable without c
   res = generate_preds(df_A, tree) #check if first node is leaf before calling!
   preds = res[0]
