@@ -6,7 +6,6 @@ import classify
 import InduceC45
 
 #allbutone = False
-#nocross = False
 
 #validation.py TrainingFile.csv restrictions.txt n
 # which will take as input the training file, the optional restrictions file and an integer number n
@@ -15,6 +14,7 @@ import InduceC45
 
 
 def cross_val(df, class_var, n): #df
+    nocross = False
     indices = np.arange(df.shape[0])
     np.random.shuffle(indices)
     #nocross = False
@@ -23,7 +23,7 @@ def cross_val(df, class_var, n): #df
         #allbutone = True
         folds = np.array_split(indices, len(indices))
     elif n == 0:
-        #nocross = True #FIXXXXXXXXXXXX
+        nocross = True #FIXXXXXXXXXXXX
         folds = np.array_split(indices, 1) #THIS IS NEW / OTHILIA
 
     else:
@@ -37,14 +37,14 @@ def cross_val(df, class_var, n): #df
     test_cols.remove(class_var)
     i= 0 
     for fold in folds:
+        print("fold: " + str(fold))
         test = df.iloc[fold].reset_index(drop = True)
         print("test: "+ test)
-        """
+        
         if nocross:
             train = test
         else:
-        """
-        train = df.iloc[-fold]
+            train = df.drop(fold).reset_index(drop=True)
         print("train: " + train) 
         #print(train, class_var, threshold)
         
