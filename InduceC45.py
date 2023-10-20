@@ -39,7 +39,7 @@ def parser(filename,restfile): #utilize restfile, if no restfile assume None val
 
   class_name = str(line3).strip()
   df_A = pd.read_csv(filename, usecols=intersection, names=intersection, skiprows=3) #creates a dataframe
-
+ 
   return (df_A, class_name)
 
 #replace with string in 3rd row of CSV WILL BE GLOBAL
@@ -62,7 +62,10 @@ def selectSplittingAttribute(A, D, threshold): #information gain
     return None
 
 def find_freqlab(D): #assuming D is df
-  return D[class_var].mode()[0]
+  values = D[class_var].value_counts(normalize = True)
+  c = values.idxmax()
+  pr = values[c]
+  return (c,pr)
 
 def enthropy(D):
   sum = 0
@@ -72,7 +75,7 @@ def enthropy(D):
     foo = D_i.shape[0] #|D_i|
     pr = foo/bar
     sum += pr * np.log2(pr)
-  return [-sum,pr]
+  return (-sum,pr)
 
 def enthropy_att(A_i, D):
   sum = 0
@@ -81,22 +84,24 @@ def enthropy_att(A_i, D):
     D_j = D[D[A_i] == i]
     foo = D_j.shape[0] #|D_j|
     pr = foo/bar
-    sum += pr * enthropy(D_j)
-  return [sum, pr]
+    sum += pr * enthropy(D_j)[0]
+  return (sum, pr)
 
 
 def c45(D, A, threshold): #going to do pandas approach, assume D is df and A is list of col names
   if D[class_var].nunique() == 1:
-    c = find_freqlab(D) #should be whatever datatype c_i is
+    temp = find_freqlab(D) #should be whatever datatype c_i is
     r = {"leaf":{}}#create node with label of only class label STAR
-    r["leaf"]["decision"] = c
+    r["leaf"]["decision"] = temp[0]
+    r["leaf"]["p"] = temp[1]
     #redundant to find mode if only one class label but bug proof!!
     T = r #following exclusively psuedo code
 
   elif not A:
-    c = find_freqlab(D) #should be whatever datatype c_i is
+    temp = find_freqlab(D) #should be whatever datatype c_i is
     r = {"leaf":{}}#create node with label of only class label STAR
-    r["leaf"]["decision"] = c
+    r["leaf"]["decision"] = temp[0]
+    r["leaf"]["p"] = temp[1]
     #redundant to find mode if only one class label but bug proof!!
     T = r
 
@@ -108,7 +113,6 @@ def c45(D, A, threshold): #going to do pandas approach, assume D is df and A is 
       r["leaf"]["decision"] = c
       #redundant to find mode if only one class label but bug proof!!
       T = r
-
     else:
      r = {"node": {"var":A_g, "edges":[]} } #dbl check with psuedo code
      T = r
@@ -133,8 +137,12 @@ def c45(D, A, threshold): #going to do pandas approach, assume D is df and A is 
           print("something is broken")
         # r["node"]["edges"].append(temp)
       else: #ghost node
-        r_v = {"leaf":{"decision":find_freqlab(D)}}
-        
+        temp = find_freqlab(D) #should be whatever datatype c_i is
+        r_v = {"leaf":{}}#create node with label of only class label STAR
+        r_v["leaf"]["decision"] = temp[0]
+        r_v["leaf"]["p"] = temp[1]
+        #FINISH
+                
       r["node"]["edges"].append(temp)
   return T
 #NEED TO ADD P TO LEAFS
@@ -152,6 +160,7 @@ def initialize_global(path_file_in, rest_file_in, write_in = False):
   write = write_in
    #determine best value
   ret = parser(path_file_in, rest_file_in)
+  #print(ret, type(ret[0]))
   D = ret[0]
   class_var = ret[1]
   
@@ -162,7 +171,7 @@ def main():
   path_file = sys.argv[1]
   rest_file = None
   if len(sys.argv) >= 3:
-    if sys.argv[2] != "n":
+    if sys.argv[2] != "None":
       rest_file = sys.argv[2]
     if len(sys.argv) >= 4 and sys.argv[3] == "write":
       write = True
