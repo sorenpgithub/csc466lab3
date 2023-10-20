@@ -10,14 +10,35 @@ def parser(filename,restfile): #utilize restfile, if no restfile assume None val
     line2 = file.readline()
     line3 = file.readline() #3 lines are special, check doc
 
+  line2_list = line2.split(',')
+  line2_list = [l2.strip() for l2 in line2_list] #gets rid of white space and \n in col names
+  
   cols = line1.split(',')
   cols = [col.strip() for col in cols] #gets rid of white space and \n in col names
-  for i in range(len(line2)):
-    if line2[i] == -1:
+
+  if restfile is not None:
+    # A restrictions file has been given
+    with open(restfile, 'r') as rest_file:
+        rest = rest_file.readline()
+        rest_list = rest.split(',')
+        rest_list = [r.strip() for r in rest_list] #gets rid of white space and \n in col names
+    temp_cols = cols
+  
+  for i in range(len(line2_list)-1, -1, -1): #goes through the file backwards to make sure we are popping the right column
+    if line2_list[i] == str(-1):
       cols.pop(i)
+    if restfile is not None:
+        # A restrictions file has been given
+        if rest_list[i] == str(0):
+            temp_cols.pop(i)
+
+  if restfile is not None:
+    intersection = [item for item in cols if item in temp_cols]
+  else:
+    intersection = cols 
 
   class_name = str(line3).strip()
-  df_A = pd.read_csv(filename, usecols=cols, names=cols, skiprows=3) #creates a dataframe
+  df_A = pd.read_csv(filename, usecols=intersection, names=intersection, skiprows=3) #creates a dataframe
 
   return (df_A, class_name)
 
