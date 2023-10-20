@@ -4,7 +4,7 @@ import sys
 import json
 #InduceC45  <TrainingSetFile.csv> [<restrictionsFile>] write
 #Basic parser
-def parser(filename,restfile):
+def parser(filename,restfile): #utilize restfile, if no restfile assume None value
   with open(filename, 'r') as file:
     line1 = file.readline()
     line2 = file.readline()
@@ -113,7 +113,7 @@ def c45(D, A, threshold): #going to do pandas approach, assume D is df and A is 
         # r["node"]["edges"].append(temp)
       else: #ghost node
         r_v = {"leaf":{"decision":find_freqlab(D)}}
-
+        
       r["node"]["edges"].append(temp)
   return T
 #NEED TO ADD P TO LEAFS
@@ -139,6 +139,7 @@ def main():
   #runs from command line
   write = False
   path_file = sys.argv[1]
+  rest_file = None
   if len(sys.argv) >= 3:
     if sys.argv[2] != "n":
       rest_file = sys.argv[2]
@@ -148,8 +149,9 @@ def main():
   
   
   
-  thresh = 0.01 #determine best value
-  categ_vars = list(D.columns).remove(class_var)
+  thresh = 0.001 #determine best value
+  categ_vars = list(D.columns)
+  categ_vars.remove(class_var)
   tree = get_tree(D, categ_vars, thresh)
   
   

@@ -12,15 +12,7 @@ nocross = False
 # which will take as input the training file, the optional restrictions file and an integer number n
 
 #INIT
-n = 5
-if len(sys.argv) >= 3: 
-    if sys.argv[2] != "na":
-        restfile = sys.argv[2]
-    if len(sys.argv) == 4:
-        n = int(sys.argv[3])
-ret = InduceC45.parser(sys.argv[1])
-D = ret[0]
-class_var = ret[1]
+
 
 
 def cross_val(df, k, class_var):
@@ -50,6 +42,20 @@ def cross_val(df, k, class_var):
     for temp in dfs: #in theory adds together matrices
         conf_matrix = conf_matrix + temp
 
+def main()
+    n = 5
+    restfile = None #default vals for optional params
+    if len(sys.argv) >= 3: #assigning params if input
+        if sys.argv[2] != "None":
+            restfile = sys.argv[2]
+        if len(sys.argv) == 4:
+            n = int(sys.argv[3])
+    ret = InduceC45.parser(sys.argv[1], restfile)
+    D = ret[0]
+    class_var = ret[1]
+
+if __name__ == "__main__":
+    main()
 
 
 
