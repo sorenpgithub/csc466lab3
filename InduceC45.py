@@ -24,10 +24,14 @@ def parser(filename,restfile):
 #replace with string in 3rd row of CSV WILL BE GLOBAL
  #list of categorical variables
 def selectSplittingAttribute(A, D, threshold): #information gain
-  p0 = enthropy(D) #\in (0,1)
+  entr = enthropy(D) #\in (0,1) -sum
+  p0 = entr[0]
+  prob = entr[1] 
   gain = [0] * len(A)
   for i, A_i in enumerate(A): #i is index, A_i is string of col name
-    p_i = enthropy_att(A_i, D)
+    entr_att = enthropy_att(A_i, D)
+    p_i = entr_att[0]
+    prob_att = entr_att[1] #is this one needed for the probability?
     gain[i] = p0 - p_i #fancy maths stuff
   m = max(gain)
   if m > threshold:
@@ -47,7 +51,7 @@ def enthropy(D):
     foo = D_i.shape[0] #|D_i|
     pr = foo/bar
     sum += pr * np.log2(pr)
-  return -sum
+  return [-sum,pr]
 
 def enthropy_att(A_i, D):
   sum = 0
@@ -55,8 +59,9 @@ def enthropy_att(A_i, D):
   for i in D[A_i].unique(): #for each value in domain of A_i
     D_j = D[D[A_i] == i]
     foo = D_j.shape[0] #|D_j|
-    sum += (foo/bar) * enthropy(D_j)
-  return sum
+    pr = foo/bar
+    sum += pr * enthropy(D_j)
+  return [sum, pr]
 
 
 def c45(D, A, threshold): #going to do pandas approach, assume D is df and A is list of col names
