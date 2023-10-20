@@ -154,14 +154,13 @@ def get_tree(D, categ_vars, thresh):
   return tree
 
 def initialize_global(path_file_in, rest_file_in, write_in = False):
-  global path, rest_file, write, thresh, D, class_var
+  global path, rest_file, write, thresh, class_var
   path = path_file_in
   rest_file = rest_file_in
   write = write_in
    #determine best value
   ret = parser(path_file_in, rest_file_in)
   #print(ret, type(ret[0]))
-  D = ret[0]
   class_var = ret[1]
   
 

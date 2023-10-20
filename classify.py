@@ -22,10 +22,19 @@ def parser_check(filename):
   return (df_A, class_name)
 
 #print(df_A.shape[0])
-def generate_preds(df_A, tree):
+def generate_preds(D, tree):
+  df_A = D.drop(class_var, axis = 1)#makes new df, not inplace
   pred = []
   correct = 0
+  if "leaf" in tree: #first element is a leaf
+    dec = tree["leaf"]["decision"]
+    pred = [dec]*D.shape[0]
+    if is_training_csv:
+      correct = (D[class_var] == pred).sum()
+    return (pred, correct)
   for index, row in df_A.iterrows(): #row is series object, val accessed like dict
+    
+
     leaf = False
     curr_node = tree["node"] #{"var":123: "edges":[....]}
     #print(curr_node)
@@ -74,12 +83,13 @@ def output_stuff(preds, correct):
   output.append("Total number of records incorrectly classified:" + str(not_correct))
   output.append("Overall Accuracy:" + str(accu_rate))
   output.append("Overall Error Rate:" + str(1 - accu_rate))
+  output.append(df_confusion.shape)
   output.append(df_confusion.to_string())
   return output
 
-def initialize_global(D_in, class_var_in, training_in, silent_in = True): 
-  global D, class_var, is_training_csv, silent
-  D = D_in #Dataframe with all observations, currently assuming is training set
+def initialize_global(class_var_in, training_in, silent_in = True): 
+  global class_var, is_training_csv, silent
+  #Dataframe with all observations, currently assuming is training set
   class_var = class_var_in #string of colname of observed vals, could be None if not training
   is_training_csv = training_in #tbd on slack response
   silent = silent_in #if each classification prints
@@ -93,11 +103,11 @@ def main():
     silent_out = (sys.argv[3] == "silent")
      
   #initializing stuff
-  #check if first element is leaf
   ret = parser_check(sys.argv[1])
-  initialize_global(ret[0], ret[1], True, silent_out)
-  df_A = D.drop(class_var, axis = 1) #drops class variable without c
-  res = generate_preds(df_A, tree) #check if first node is leaf before calling!
+  initialize_global(ret[1], True, silent_out) 
+  #drops class variable without c
+  D = ret[0]
+  res = generate_preds(D, tree) #check if first node is leaf before calling!
   preds = res[0]
   correct = res[1]
   outs = output_stuff(preds, correct)

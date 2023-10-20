@@ -15,9 +15,12 @@ nocross = False
 
 
 
-def cross_val(df, class_var, n):
+def cross_val(df, class_var, n): #df
     
-    indices = np.arrange(df.shape[0])
+    indices = np.arange(df.shape[0])
+    np.random.shuffle(indices)
+    nocross = False
+    allbutone = False
     if n == -1:
         allbutone = True
     elif n == 0:
@@ -27,25 +30,32 @@ def cross_val(df, class_var, n):
     
     threshold = 0.1 #change
     dfs = []
-    dim = df["class_var"].nunique()
-    conf_matrix = pd.DataFrame(nrow = dim + 1, ncol = dim + 1) #define correct dimensions!!!!!!!
-
+    dim = df[class_var].nunique()
+    conf_matrix = pd.DataFrame(0, index = range(dim + 1), columns = range(dim + 1)) #define correct dimensions!!!!!!!
+    test_cols = list(df.columns) #column names
+    test_cols.remove(class_var)
+    i= 0 
     for fold in folds:
-        test = df.iloc[fold]
+        test = df.iloc[fold].reset_index(drop = True)
+
         if nocross:
             train = test
         else:
             train = df.iloc[-fold]
+        #print(train, class_var, threshold)
         
-        tree =  InduceC45.foobar(train, class_var, threshold) #returns dict tree
-        predictions = classify.generate_preds(test, class_var, tree)[0] #returns
+        tree =  InduceC45.get_tree(train, test_cols, threshold) #returns dict tree
+        classify.initialize_global(class_var, True, True) #1st True = is_training since doc asserts working with training file
+        print("fold", i, "\n", tree)
+        predictions = classify.generate_preds(test, tree)[0] #returns
 
         y_pred = pd.Series(predictions)
         y_actu = test[class_var]
         df_confusion = pd.crosstab(y_actu, y_pred, rownames=['Actual'], colnames=['Predicted'], margins=True)
-
+        
         dfs.append(df_confusion)
         #train the model
+        i += 1
     for temp in dfs: #in theory adds together matrices
         conf_matrix = conf_matrix + temp #might break
   
@@ -80,11 +90,11 @@ def main():
     D = ret[0]
     class_var = ret[1]
     InduceC45.initialize_global(path, restfile, False)
-    classify.initialize_global(D, class_var, True, True) #1st True = is_training since doc asserts working with training file
+ #1st True = is_training since doc asserts working with training file
     #2nd true is silent since we don't want outputs, should be the case
   
     cross_ret = cross_val(D, class_var, n)
-    cross_ret
+    #print(cross_ret.to_string())
 
 
 if __name__ == "__main__":
