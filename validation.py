@@ -30,8 +30,8 @@ def cross_val(df, class_var, n): #df
     
     threshold = 0.1 #change
     dfs = []
-    dim = df[class_var].nunique()
-    conf_matrix = pd.DataFrame(0, index = range(dim + 1), columns = range(dim + 1)) #define correct dimensions!!!!!!!
+    dom = df[class_var].unique()
+     #define correct dimensions!!!!!!!
     test_cols = list(df.columns) #column names
     test_cols.remove(class_var)
     i= 0 
@@ -46,20 +46,38 @@ def cross_val(df, class_var, n): #df
         
         tree =  InduceC45.get_tree(train, test_cols, threshold) #returns dict tree
         classify.initialize_global(class_var, True, True) #1st True = is_training since doc asserts working with training file
-        print("fold", i, "\n", tree)
+        #print("fold", i, "\n", tree)
         predictions = classify.generate_preds(test, tree)[0] #returns
 
         y_pred = pd.Series(predictions)
         y_actu = test[class_var]
-        df_confusion = pd.crosstab(y_actu, y_pred, rownames=['Actual'], colnames=['Predicted'], margins=True)
-        
+        #print("pred: fold", i, "\n", y_pred)
+        #print("actu: fold", i, "\n", y_actu)
+        df_confusion = pd.crosstab(y_actu, y_pred,rownames=['Actual'], colnames=['Predicted'] )
+        df_confusion = df_confusion.reindex(index = dom, columns= dom, fill_value = 0)
+        print("fold", i, "\n", df_confusion)
+
         dfs.append(df_confusion)
         #train the model
         i += 1
-    for temp in dfs: #in theory adds together matrices
-        conf_matrix = conf_matrix + temp #might break
+
+
   
-    return conf_matrix
+    result = dfs[0] 
+    if len(dfs) > 1:
+        for temp in dfs[1:]:
+            result += temp
+    row_tot = result.sum(axis=1)
+    col_tot = result.sum()
+
+    #result = pd.concat([result, row_tot.rename('Row Total')], axis=1)
+    #result = pd.concat([result, col_tot.rename('Column Total')])
+    result.loc['Row Total']= result.sum()
+    result['Col Total'] = result.sum(axis=1)
+
+
+    return result
+
 
 def output(temp):
     pass
@@ -94,7 +112,7 @@ def main():
     #2nd true is silent since we don't want outputs, should be the case
   
     cross_ret = cross_val(D, class_var, n)
-    #print(cross_ret.to_string())
+    print(cross_ret.to_string())
 
 
 if __name__ == "__main__":

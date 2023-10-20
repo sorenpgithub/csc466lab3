@@ -71,7 +71,7 @@ def generate_preds(D, tree):
       #break
   return (pred, correct)
 
-def output_stuff(preds, correct):
+def output_stuff(D, preds, correct):
   output = []
   y_pred = pd.Series(preds)
   y_actu = D[class_var]
@@ -110,7 +110,7 @@ def main():
   res = generate_preds(D, tree) #check if first node is leaf before calling!
   preds = res[0]
   correct = res[1]
-  outs = output_stuff(preds, correct)
+  outs = output_stuff(D, preds, correct)
   for out in outs:
     sys.stdout.write(out + "\n")
 
