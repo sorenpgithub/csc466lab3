@@ -16,6 +16,12 @@ def parser(filename,restfile): #utilize restfile, if no restfile assume None val
   cols = line1.split(',')
   cols = [col.strip() for col in cols] #gets rid of white space and \n in col names
 
+  class_name = str(line3).strip()
+
+  for i in range(len(line2_list)-1, -1, -1): #goes through the file backwards to make sure we are popping the right column
+    if line2_list[i] == str(-1):
+      cols.pop(i)
+
   if restfile is not None:
     # A restrictions file has been given
     with open(restfile, 'r') as rest_file:
@@ -23,21 +29,17 @@ def parser(filename,restfile): #utilize restfile, if no restfile assume None val
         rest_list = rest.split(',')
         rest_list = [r.strip() for r in rest_list] #gets rid of white space and \n in col names
     temp_cols = cols
-  
-  for i in range(len(line2_list)-1, -1, -1): #goes through the file backwards to make sure we are popping the right column
-    if line2_list[i] == str(-1):
-      cols.pop(i)
-    if restfile is not None:
-        # A restrictions file has been given
-        if rest_list[i] == str(0):
+    
+    temp_cols.remove(class_name)
+    for i in range(len(rest_list)-1, -1, -1): #the length of rest_list is one less than line2_list (since it should not contain the class attribute)
+      if rest_list[i] == str(0):
             temp_cols.pop(i)
-
-  if restfile is not None:
+    temp_cols.append(class_name)
     intersection = [item for item in cols if item in temp_cols]
-  else:
+  
+  else: 
     intersection = cols 
 
-  class_name = str(line3).strip()
   df_A = pd.read_csv(filename, usecols=intersection, names=intersection, skiprows=3) #creates a dataframe
  
   return (df_A, class_name)
@@ -154,7 +156,7 @@ def get_tree(D, categ_vars, thresh):
   return tree
 
 def initialize_global(path_file_in, rest_file_in, write_in = False):
-  global path, rest_file, write, thresh, class_var
+  global path, rest_file, write, thresh, class_var, D
   path = path_file_in
   rest_file = rest_file_in
   write = write_in
@@ -162,6 +164,8 @@ def initialize_global(path_file_in, rest_file_in, write_in = False):
   ret = parser(path_file_in, rest_file_in)
   #print(ret, type(ret[0]))
   class_var = ret[1]
+  D = ret[0]
+
   
 
 def main():
