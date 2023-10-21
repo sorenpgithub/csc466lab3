@@ -14,10 +14,9 @@ import InduceC45
 
 
 def cross_val(df, class_var, n): #df
-    nocross = False
     indices = np.arange(df.shape[0])
     np.random.shuffle(indices)
-    #nocross = False
+    nocross = False
     #allbutone = False
     if n == -1:
         #allbutone = True
@@ -29,7 +28,7 @@ def cross_val(df, class_var, n): #df
     else:
         folds = np.array_split(indices, n) #k folds for cross validation
     
-    threshold = 0.1 #change
+    threshold = 0.01 #change
     dfs = []
     dom = df[class_var].unique()
      #define correct dimensions!!!!!!!
@@ -66,8 +65,9 @@ def cross_val(df, class_var, n): #df
         i += 1
 
 
-  
-    result = dfs[0] 
+
+    result = dfs[0]
+    print("res"+str(result)) 
     if len(dfs) > 1:
         for temp in dfs[1:]:
             result += temp
@@ -116,8 +116,34 @@ def main():
     #2nd true is silent since we don't want outputs, should be the case
   
     cross_ret = cross_val(D, class_var, n)
-    print(cross_ret.to_string())
+    print("CROSS_RET: "+cross_ret.to_string())
+
+    #Accuracy = (TP + TN) / (TP + TN + FP + FN)
+    total_conf_matrix_array = cross_ret.to_numpy() #converting the confusion matrix to a numpy array
+    conf_matrix_array = total_conf_matrix_array[:-1, :-1] #excluding the total rows/columns
+    TP_TN = np.diag(conf_matrix_array).sum() #the diaganol sum
+    total_sum_conf_matrix = conf_matrix_array.sum()
+    accuracy = TP_TN / total_sum_conf_matrix
+    print("Accuracy: " +str(accuracy*100) + "%")
+
+
+    #Precision & Recall --> fine for this assignment, report it for one of the classes (?)
+
+    ## Precision = TP / (TP + FP)
+    
+
+
+    ## Recall = TP / (TP + FN)
+    #cross_ret is a 
+
 
 
 if __name__ == "__main__":
     main()
+
+
+
+
+
+    
+    
