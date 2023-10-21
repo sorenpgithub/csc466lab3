@@ -36,15 +36,12 @@ def cross_val(df, class_var, n): #df
     test_cols.remove(class_var)
     i= 0 
     for fold in folds:
-        print("fold: " + str(fold))
         test = df.iloc[fold].reset_index(drop = True)
-        print("test: "+ test)
         
         if nocross:
             train = test
         else:
             train = df.drop(fold).reset_index(drop=True)
-        print("train: " + train) 
         #print(train, class_var, threshold)
         
         tree =  InduceC45.get_tree(train, test_cols, threshold) #returns dict tree
@@ -116,26 +113,30 @@ def main():
     #2nd true is silent since we don't want outputs, should be the case
   
     cross_ret = cross_val(D, class_var, n)
-    print("CROSS_RET: "+cross_ret.to_string())
 
-    #Accuracy = (TP + TN) / (TP + TN + FP + FN)
+    #ACCURACY 
+    # = (TP + TN) / (TP + TN + FP + FN)
     total_conf_matrix_array = cross_ret.to_numpy() #converting the confusion matrix to a numpy array
     conf_matrix_array = total_conf_matrix_array[:-1, :-1] #excluding the total rows/columns
-    TP_TN = np.diag(conf_matrix_array).sum() #the diaganol sum
-    total_sum_conf_matrix = conf_matrix_array.sum()
-    accuracy = TP_TN / total_sum_conf_matrix
+    TP = np.diag(conf_matrix_array) #
+    accuracy = TP.sum() / conf_matrix_array.sum()
     print("Accuracy: " +str(accuracy*100) + "%")
 
+    #PRECISION & RECALL 
+    # --> fine for this assignment, report it for one of the classes (?)
+    precision = {} #Precision = TP / (TP + FP) --> vertically
+    recall = {}  #Recall = TP / (TP + FN) --> Horisontolly
+    class_names = cross_ret.index.tolist()[:-1]  # Exclude the 'Row Total' label
 
-    #Precision & Recall --> fine for this assignment, report it for one of the classes (?)
+    for j in range(len(TP)): 
+        nom = TP[j] #TP
+        denom_precision = total_conf_matrix_array[-1][j] #sum of column (is found in the total)
+        precision[class_names[j]] = "Precision for " + str(class_names[j]) + " = " + str((nom/denom_precision)*100) + "%"
+        denom_recall = total_conf_matrix_array[j][-1]
+        recall[class_names[j]] = "Recall for " + str(class_names[j]) + " = " + str((nom/denom_recall)*100) + "%"
 
-    ## Precision = TP / (TP + FP)
-    
-
-
-    ## Recall = TP / (TP + FN)
-    #cross_ret is a 
-
+    print(precision)
+    print(recall) 
 
 
 if __name__ == "__main__":
@@ -143,7 +144,3 @@ if __name__ == "__main__":
 
 
 
-
-
-    
-    
