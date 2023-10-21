@@ -1,3 +1,11 @@
+#CSC 466 Fall 2023 - Lab 3: Decision Trees, part 1
+#Othilia Norell and Soren Paetau \\ onorell@calpoly.edu  / spaetau@calpoly.edu
+
+#HOW TO RUN:
+#validation.py TrainingFile.csv restrictions.txt n
+
+
+
 import sys
 import pandas as pd
 import json
@@ -5,25 +13,18 @@ import numpy as np
 import classify
 import InduceC45
 
-#allbutone = False
+"""
 
-#validation.py TrainingFile.csv restrictions.txt n
-# which will take as input the training file, the optional restrictions file and an integer number n
-
-#INIT
-
-
+"""
 def cross_val(df, class_var, n): #df
     indices = np.arange(df.shape[0])
     np.random.shuffle(indices)
     nocross = False
-    #allbutone = False
     if n == -1:
-        #allbutone = True
         folds = np.array_split(indices, len(indices))
     elif n == 0:
-        nocross = True #FIXXXXXXXXXXXX
-        folds = np.array_split(indices, 1) #THIS IS NEW / OTHILIA
+        nocross = True 
+        folds = np.array_split(indices, 1)
 
     else:
         folds = np.array_split(indices, n) #k folds for cross validation
@@ -31,7 +32,7 @@ def cross_val(df, class_var, n): #df
     threshold = 0.01 #change
     dfs = []
     dom = df[class_var].unique()
-     #define correct dimensions!!!!!!!
+    #define correct dimensions!!!!!!!
     test_cols = list(df.columns) #column names
     test_cols.remove(class_var)
     i= 0 
@@ -42,17 +43,14 @@ def cross_val(df, class_var, n): #df
             train = test
         else:
             train = df.drop(fold).reset_index(drop=True)
-        #print(train, class_var, threshold)
         
         tree =  InduceC45.get_tree(train, test_cols, threshold) #returns dict tree
         classify.initialize_global(class_var, True, True) #1st True = is_training since doc asserts working with training file
-        #print("fold", i, "\n", tree)
         predictions = classify.generate_preds(test, tree)[0] #returns
 
         y_pred = pd.Series(predictions)
         y_actu = test[class_var]
-        #print("pred: fold", i, "\n", y_pred)
-        #print("actu: fold", i, "\n", y_actu)
+
         df_confusion = pd.crosstab(y_actu, y_pred,rownames=['Actual'], colnames=['Predicted'] )
         df_confusion = df_confusion.reindex(index = dom, columns= dom, fill_value = 0)
         print("fold", i, "\n", df_confusion)
@@ -60,8 +58,6 @@ def cross_val(df, class_var, n): #df
         dfs.append(df_confusion)
         #train the model
         i += 1
-
-
 
     result = dfs[0]
     print("res"+str(result)) 
@@ -76,10 +72,10 @@ def cross_val(df, class_var, n): #df
     result.loc['Row Total']= result.sum()
     result['Col Total'] = result.sum(axis=1)
 
-
     return result
 
-
+"""
+"""
 def output(temp):
     pass
     # #https://stackoverflow.com/questions/69916525/easy-way-to-extract-common-measures-such-as-accuracy-precision-recall-from-3x3
@@ -96,6 +92,9 @@ def output(temp):
     #                     'Recall': recall,
     #                     'F-score': f_score}).round(2)
 
+"""
+Main Function
+"""
 def main():
     n = 5
     restfile = None #default vals for optional params
@@ -144,3 +143,7 @@ if __name__ == "__main__":
 
 
 
+
+
+    
+    
