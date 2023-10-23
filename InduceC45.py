@@ -199,6 +199,7 @@ def initialize_global(path_file_in, rest_file_in, write_in = False):
   ret = parser(path_file_in, rest_file_in)
   #print(ret, type(ret[0]))
   class_var = ret[1]
+  return(ret[0])
 
 
 """
@@ -214,14 +215,14 @@ def main():
       rest_file = sys.argv[2]
     if len(sys.argv) >= 4 and sys.argv[3] == "write":
       write = True
-  initialize_global(path_file, rest_file, write)
+  D = initialize_global(path_file, rest_file, write) #shouldnt break anything
   
   thresh = 0.001 #determine best value
   categ_vars = list(D.columns)
   categ_vars.remove(class_var)
   tree = get_tree(D, categ_vars, thresh)
   
-  out = {"dataset":path} #be careful if using path
+  out = {"dataset":path} #be careful if using path instead of filename
   out.update(tree)
   
   json_obj =  json.dumps(out, indent = 4)
