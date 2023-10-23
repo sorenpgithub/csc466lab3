@@ -93,6 +93,44 @@ def output(temp):
     #                     'F-score': f_score}).round(2)
 
 """
+Calculates and returns the accuracy, precision and recall
+"""
+def metrics(cross_ret):
+    #ACCURACY 
+    # = (TP + TN) / (TP + TN + FP + FN)
+    total_conf_matrix_array = cross_ret.to_numpy() #converting the confusion matrix to a numpy array
+    conf_matrix_array = total_conf_matrix_array[:-1, :-1] #excluding the total rows/columns
+    TP = np.diag(conf_matrix_array) #
+    accuracy = TP.sum() / conf_matrix_array.sum()
+    print("Accuracy: " +str(accuracy*100) + "%")
+
+    #PRECISION & RECALL 
+    # --> fine for this assignment, report it for one of the classes (?)
+    precision = {} #Precision = TP / (TP + FP) --> vertically
+    recall = {}  #Recall = TP / (TP + FN) --> Horisontolly
+    class_names = cross_ret.index.tolist()[:-1]  # Exclude the 'Row Total' label
+
+    for j in range(len(TP)): 
+        nom = TP[j] #TP
+        denom_precision = total_conf_matrix_array[-1][j] #sum of column (is found in the total)
+
+        if denom_precision != 0: 
+            precision[class_names[j]] = "Precision for " + str(class_names[j]) + " = " + str((nom/denom_precision)*100) + "%"
+        else: 
+            precision[class_names[j]] = "Precision for " + str(class_names[j]) + " = " + str(0) + "%"
+        
+        denom_recall = total_conf_matrix_array[j][-1]
+        if denom_recall != 0:
+            recall[class_names[j]] = "Recall for " + str(class_names[j]) + " = " + str((nom/denom_recall)*100) + "%"
+        else: 
+            recall[class_names[j]] = "Recall for " + str(class_names[j]) + " = " + str(0) + "%"
+
+    
+    print(precision)
+    print(recall) 
+
+
+"""
 Main Function
 """
 def main():
@@ -113,37 +151,10 @@ def main():
   
     cross_ret = cross_val(D, class_var, n)
 
-    #ACCURACY 
-    # = (TP + TN) / (TP + TN + FP + FN)
-    total_conf_matrix_array = cross_ret.to_numpy() #converting the confusion matrix to a numpy array
-    conf_matrix_array = total_conf_matrix_array[:-1, :-1] #excluding the total rows/columns
-    TP = np.diag(conf_matrix_array) #
-    accuracy = TP.sum() / conf_matrix_array.sum()
-    print("Accuracy: " +str(accuracy*100) + "%")
-
-    #PRECISION & RECALL 
-    # --> fine for this assignment, report it for one of the classes (?)
-    precision = {} #Precision = TP / (TP + FP) --> vertically
-    recall = {}  #Recall = TP / (TP + FN) --> Horisontolly
-    class_names = cross_ret.index.tolist()[:-1]  # Exclude the 'Row Total' label
-
-    for j in range(len(TP)): 
-        nom = TP[j] #TP
-        denom_precision = total_conf_matrix_array[-1][j] #sum of column (is found in the total)
-        precision[class_names[j]] = "Precision for " + str(class_names[j]) + " = " + str((nom/denom_precision)*100) + "%"
-        denom_recall = total_conf_matrix_array[j][-1]
-        recall[class_names[j]] = "Recall for " + str(class_names[j]) + " = " + str((nom/denom_recall)*100) + "%"
-
-    print(precision)
-    print(recall) 
+    metrics(cross_ret)
 
 
 if __name__ == "__main__":
     main()
 
-
-
-
-
-    
     
