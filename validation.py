@@ -43,17 +43,18 @@ def cross_val(df, class_var, n): #df
             train = test
         else:
             train = df.drop(fold).reset_index(drop=True)
-        
+        print("in fold", i)
         tree =  InduceC45.get_tree(train, test_cols, threshold) #returns dict tree
+        print("tree ", i, " obtained", tree)
         classify.initialize_global(class_var, True, True) #1st True = is_training since doc asserts working with training file
         predictions = classify.generate_preds(test, tree)[0] #returns
-
+        print("preds generated")
         y_pred = pd.Series(predictions)
         y_actu = test[class_var]
 
         df_confusion = pd.crosstab(y_actu, y_pred,rownames=['Actual'], colnames=['Predicted'] )
         df_confusion = df_confusion.reindex(index = dom, columns= dom, fill_value = 0)
-        print("fold", i, "\n", df_confusion)
+        #rint("fold", i, "\n", df_confusion)
 
         dfs.append(df_confusion)
         #train the model
@@ -100,6 +101,7 @@ def metrics(cross_ret):
     conf_matrix_array = total_conf_matrix_array[:-1, :-1] #excluding the total rows/columns
     TP = np.diag(conf_matrix_array) #
     accuracy = TP.sum() / conf_matrix_array.sum()
+    print("")
     print("Accuracy: " +str(accuracy*100) + "%")
 
     #PRECISION & RECALL 
@@ -123,7 +125,7 @@ def metrics(cross_ret):
         else: 
             recall[class_names[j]] = "Recall for " + str(class_names[j]) + " = " + str(0) + "%"
 
-    
+
     print(precision)
     print(recall) 
 
@@ -144,6 +146,7 @@ def main():
     D = ret[0]
     class_var = ret[1]
     InduceC45.initialize_global(path, restfile, False)
+    print("global initialized")
  #1st True = is_training since doc asserts working with training file
     #2nd true is silent since we don't want outputs, should be the case
   
