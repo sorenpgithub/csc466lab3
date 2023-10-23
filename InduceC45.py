@@ -120,7 +120,7 @@ def enthropy_att(A_i, D):
 Helper function for edge cases
 Constructs and returns a leaf node for a decision tree based on the most frequent class label
 """
-def create_node():
+def create_node(D):
   temp = find_freqlab(D) #should be whatever datatype c_i is
   r = {"leaf":{}}#create node with label of only class label STAR
   r["leaf"]["decision"] = temp[0]
@@ -136,18 +136,18 @@ def c45(D, A, threshold): #going to do pandas approach, assume D is df and A is 
   #Edge case 1
   if D[class_var].nunique() == 1:
     #redundant to find mode if only one class label but bug proof!!
-    T = create_node() #following exclusively psuedo code
+    T = create_node(D) #following exclusively psuedo code
 
   #Edge case 2
   elif not A:
     #redundant to find mode if only one class label but bug proof!!
-    T = create_node()
+    T = create_node(D)
 
   #"Normal" case
   else:
     A_g = selectSplittingAttribute(A, D, threshold) #string of column name
     if A_g is None:
-      T = create_node()
+      T = create_node(D)
     else:
      r = {"node": {"var":A_g, "edges":[]} } #dblcheck with psuedo code
      T = r
