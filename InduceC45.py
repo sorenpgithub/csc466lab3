@@ -45,6 +45,7 @@ def parser(filename,restfile): #utilize restfile, if no restfile assume None val
     temp_cols = cols
     
     temp_cols.remove(class_name) #The size of the vector is equal to the number of columns in the dataset without the category variable
+    
     for i in range(len(rest_list)-1, -1, -1): 
       if rest_list[i] == str(0):
             temp_cols.pop(i)
@@ -178,8 +179,7 @@ def c45(D, A, threshold): #going to do pandas approach, assume D is df and A is 
                 
       r["node"]["edges"].append(temp)
   return T
-#NEED TO ADD P TO LEAFS
-#could use pandas?
+
 
 """
 Calling the C4.5 function

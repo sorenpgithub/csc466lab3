@@ -64,8 +64,6 @@ def cross_val(df, class_var, n): #df
     if len(dfs) > 1:
         for temp in dfs[1:]:
             result += temp
-    row_tot = result.sum(axis=1)
-    col_tot = result.sum()
 
     #result = pd.concat([result, row_tot.rename('Row Total')], axis=1)
     #result = pd.concat([result, col_tot.rename('Column Total')])
@@ -150,7 +148,7 @@ def main():
     #2nd true is silent since we don't want outputs, should be the case
   
     cross_ret = cross_val(D, class_var, n)
-
+    sys.stdout.write(cross_ret.to_string())
     metrics(cross_ret)
 
 
