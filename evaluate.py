@@ -36,6 +36,7 @@ def cross_val(df, class_var, n): #df
     test_cols = list(df.columns) #column names
     test_cols.remove(class_var)
     i= 0 
+    
     for fold in folds:
         test = df.iloc[fold].reset_index(drop = True)
         
@@ -72,6 +73,8 @@ def cross_val(df, class_var, n): #df
     result['Col Total'] = result.sum(axis=1)
 
     return result
+
+
 
 """
 """

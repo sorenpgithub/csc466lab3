@@ -157,7 +157,7 @@ def c45(D, A, threshold, current_depth=0, max_depth=None): #going to do pandas a
      r = {"node": {"var":A_g, "edges":[]} } #dblcheck with psuedo code
      T = r
     #reference vs assignment are very delicate, triple check alg
-    for v in D[A_g].unique(): #iterate over each unique value (Domain) of attribute (South, West..)
+    for v in doms[A_g]: #iterate over each unique value (Domain) of attribute (South, West..)
       D_v = D[D[A_g] == v] #dataframe with where attribute equals value
       if not D_v.empty: #true if D_v \neq \emptyset
         #test
@@ -175,13 +175,6 @@ def c45(D, A, threshold, current_depth=0, max_depth=None): #going to do pandas a
           print("something is broken")
         # r["node"]["edges"].append(temp)
       else: #ghost node
-        """
-        foo = find_freqlab(D) #should be whatever datatype c_i is
-        r_v = {"leaf":{}} #create node with label of only class label STAR
-        r_v["leaf"]["decision"] = foo[0]
-        r_v["leaf"]["p"] = foo[1]
-        #FINISH
-        """
         print("GHOST PATH")
         label_info = find_freqlab(D) #determines the most frequent class label and its proportion
         ghost_node = {"leaf":{}} #initialize a leaf node
@@ -203,7 +196,7 @@ def get_tree(D, categ_vars, thresh, max_depth=None):
 
 
 def initialize_global(path_file_in, rest_file_in, write_in = False):
-  global path, rest_file, write, thresh, class_var
+  global path, rest_file, write, thresh, class_var, doms
   path = path_file_in
   rest_file = rest_file_in
   write = write_in
@@ -211,9 +204,15 @@ def initialize_global(path_file_in, rest_file_in, write_in = False):
   ret = parser(path_file_in, rest_file_in)
   #print(ret, type(ret[0]))
   class_var = ret[1]
+  df = ret[0]
+  doms = dom_dict(df)
   return(ret[0])
 
-
+def dom_dict(df):
+    temp = {}
+    for column in df.columns:
+        temp[column] = df[column].unique().tolist()
+    return temp
 """
 Main function
 """
