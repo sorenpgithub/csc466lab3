@@ -43,12 +43,12 @@ def cross_val(df, class_var, n): #df
             train = test
         else:
             train = df.drop(fold).reset_index(drop=True)
-        print("in fold", i)
+        #print("in fold", i)
         tree =  InduceC45.get_tree(train, test_cols, threshold) #returns dict tree
-        print("tree ", i, " obtained", tree)
+        #print("tree ", i, " obtained", tree)
         classify.initialize_global(class_var, True, True) #1st True = is_training since doc asserts working with training file
         predictions = classify.generate_preds(test, tree)[0] #returns
-        print("preds generated")
+        #print("preds generated")
         y_pred = pd.Series(predictions)
         y_actu = test[class_var]
 
@@ -61,7 +61,7 @@ def cross_val(df, class_var, n): #df
         i += 1
 
     result = dfs[0]
-    print("res"+str(result)) 
+    #print("res"+str(result)) 
     if len(dfs) > 1:
         for temp in dfs[1:]:
             result += temp
@@ -146,7 +146,7 @@ def main():
     D = ret[0]
     class_var = ret[1]
     InduceC45.initialize_global(path, restfile, False)
-    print("global initialized")
+    #print("global initialized")
  #1st True = is_training since doc asserts working with training file
     #2nd true is silent since we don't want outputs, should be the case
   

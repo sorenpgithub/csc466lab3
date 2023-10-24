@@ -59,7 +59,7 @@ def generate_preds(D, tree):
     return (pred, correct)
   
   for index, row in df_A.iterrows(): #row is series object, val accessed like dict
-    print("in row", index)
+    #print("in row", index)
     leaf = False
     curr_node = tree["node"] #{"var":123: "edges":[....]}
 
@@ -69,8 +69,8 @@ def generate_preds(D, tree):
 
       for edg in curr_node["edges"]: #list of edges | edg = {"edge":{"value"}}
         curr_edge = edg["edge"]
-        print("current edge", curr_edge)
-        print("observed", A_i, obs_val)
+        #print("current edge", curr_edge)
+        #print("observed", A_i, obs_val)
 
         if curr_edge["value"] == obs_val: 
           if "node" in curr_edge:
