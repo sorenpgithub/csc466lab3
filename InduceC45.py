@@ -133,7 +133,11 @@ Implements the C4.5 algorithm for building a decision tree
 from a dataset D based on a list of attributes A and a threshold value for information gain
 Returns the (sub)tree T rooted at the current node
 """
-def c45(D, A, threshold): #going to do pandas approach, assume D is df and A is list of col names
+def c45(D, A, threshold, current_depth=0, max_depth=None): #going to do pandas approach, assume D is df and A is list of col names
+  
+  if max_depth is not None and current_depth == max_depth:
+    return create_node(D)
+  
   #Edge case 1
   if D[class_var].nunique() == 1:
     #redundant to find mode if only one class label but bug proof!!
@@ -160,7 +164,7 @@ def c45(D, A, threshold): #going to do pandas approach, assume D is df and A is 
         A_temp = A.copy()
         A_temp.remove(A_g)
         #print(A_temp)
-        T_v = c45(D_v, A_temp, threshold)
+        T_v = c45(D_v, A_temp, threshold, current_depth + 1, max_depth)
         temp = {"edge":{"value":v}}
         #modify to contain edge value, look at lec06 example
         if "node" in T_v:
@@ -171,11 +175,19 @@ def c45(D, A, threshold): #going to do pandas approach, assume D is df and A is 
           print("something is broken")
         # r["node"]["edges"].append(temp)
       else: #ghost node
-        temp = find_freqlab(D) #should be whatever datatype c_i is
+        """
+        foo = find_freqlab(D) #should be whatever datatype c_i is
         r_v = {"leaf":{}} #create node with label of only class label STAR
-        r_v["leaf"]["decision"] = temp[0]
-        r_v["leaf"]["p"] = temp[1]
+        r_v["leaf"]["decision"] = foo[0]
+        r_v["leaf"]["p"] = foo[1]
         #FINISH
+        """
+        print("GHOST PATH")
+        label_info = find_freqlab(D) #determines the most frequent class label and its proportion
+        ghost_node = {"leaf":{}} #initialize a leaf node
+        ghost_node["leaf"]["decision"] = label_info[0] #set the decision to the most frequent class label
+        ghost_node["leaf"]["p"] = label_info[1] #set the probability or proportion
+        temp = {"edge": {"value": v, "leaf": ghost_node["leaf"]}}
                 
       r["node"]["edges"].append(temp)
   return T
@@ -185,8 +197,8 @@ def c45(D, A, threshold): #going to do pandas approach, assume D is df and A is 
 Calling the C4.5 function
 Returns the decision tree
 """
-def get_tree(D, categ_vars, thresh):
-  tree = c45(D, categ_vars, thresh)
+def get_tree(D, categ_vars, thresh, max_depth=None):
+  tree = c45(D, categ_vars, thresh, 0, max_depth)
   return tree
 
 
@@ -220,7 +232,9 @@ def main():
   thresh = 0.001 #determine best value
   categ_vars = list(D.columns)
   categ_vars.remove(class_var)
-  tree = get_tree(D, categ_vars, thresh)
+
+  max_tree_depth = 2
+  tree = get_tree(D, categ_vars, thresh, max_tree_depth)
   
   out = {"dataset":path} #be careful if using path instead of filename
   out.update(tree)
