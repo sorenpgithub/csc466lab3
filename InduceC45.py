@@ -76,7 +76,7 @@ def selectSplittingAttribute(A, D, threshold): #information gain
   p0 = enthropy(D) #\in (0,1) -sum
   gain = [0] * len(A)
   for i, A_i in enumerate(A): #i is index, A_i is string of col name
-    if A_i in categ_vars:
+    if A_i in categorical_vars:
       p_i = enthropy_att(A_i, D)
        #appending the info gain for each attribute to a list
     else:
@@ -241,7 +241,7 @@ def get_tree(D, vars, thresh, max_depth=None):
 
 
 def initialize_global(path_file_in, rest_file_in, write_in = False):
-  global path, rest_file, write, thresh, class_var, doms, categ_vars, categorical_vars
+  global path, rest_file, write, thresh, class_var, doms, categorical_vars#, categ_vars
   path = path_file_in
   rest_file = rest_file_in
   write = write_in
@@ -251,7 +251,7 @@ def initialize_global(path_file_in, rest_file_in, write_in = False):
   class_var = ret[1]
   df = ret[0]
   doms = dom_dict(df)
-  categ_vars = []#PARSE IN LIST OF CATEGORICAL VARIABLES!!!
+  #categ_vars = []#PARSE IN LIST OF CATEGORICAL VARIABLES!!!
   categorical_vars = ret[2]
   return(ret[0])
 
@@ -276,11 +276,13 @@ def main():
   D = initialize_global(path_file, rest_file, write) #shouldnt break anything
   
   thresh = 0.01 #determine best value
-  categ_vars = list(D.columns)
-  categ_vars.remove(class_var)
+  #categ_vars = list(D.columns)
+  #categ_vars.remove(class_var)
+
+  categorical_vars.remove(class_var)
 
   max_tree_depth = 2
-  tree = get_tree(D, categ_vars, thresh, max_tree_depth)
+  tree = get_tree(D, categorical_vars, thresh, max_tree_depth)
   
   out = {"dataset":path} #be careful if using path instead of filename
   out.update(tree)
