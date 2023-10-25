@@ -16,7 +16,7 @@ import InduceC45
 """
 
 """
-def cross_val(df, class_var, n): #df
+def cross_val(df, class_var, n, silent): #df
     indices = np.arange(df.shape[0])
     np.random.shuffle(indices)
     nocross = False
@@ -48,7 +48,7 @@ def cross_val(df, class_var, n): #df
         #print("in fold", i)
         tree =  InduceC45.get_tree(train, test_cols, threshold) #returns dict tree
         #print("tree ", i, " obtained", tree)
-        classify.initialize_global(class_var, True, True) #1st True = is_training since doc asserts working with training file
+        classify.initialize_global(class_var, True, silent) #1st True = is_training since doc asserts working with training file
         predictions = classify.generate_preds(test, tree) #returns
         #print("preds generated")
         y_pred = pd.Series(predictions[0])
@@ -154,7 +154,7 @@ def main():
  #1st True = is_training since doc asserts working with training file
     #2nd true is silent since we don't want outputs, should be the case
   
-    cross_ret = cross_val(D, class_var, n)
+    cross_ret = cross_val(D, class_var, n, True)
     outs = metrics(cross_ret)
     output(outs)
 

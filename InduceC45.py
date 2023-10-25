@@ -92,23 +92,23 @@ def selectSplittingAttribute(A, D, threshold): #information gain
   
   
 def findBestSplit(A_i, D): #WONT WORK
-  c_dom = doms[class_var]
-  k = len(c_dom)
-  counts = [[0]] * k ##SKETCH OUT ON PAPER TO MAKE SURE VALUESS ARE RIGHT
-  p0 = enthropy(D)
-  df = D.sort_values(by=A_i)
-  alpha = []
-  gain = []
-  for index,row in df.iterrows(): #index == l in psuedocode
-    alpha.append(row[A_i]) #row[A_i] = d[A_i] aka value of cont variable for that row
-    for j in range(k): #iterate through every class_var
-      if row[class_var] == c_dom[j]: #class(d) == c_j
-        counts[j][index] = counts[j][index - 1] + 1 #this will throw a bug when index is 0
-      else:
-        counts[j][index] = counts[j][index - 1]
-  for index, row in df.iterrows():
-    counts = 0
-    gain.append(p0 - enthropy_vals())
+  # c_dom = doms[class_var]
+  # k = len(c_dom)
+  # counts = [[0]] * k ##SKETCH OUT ON PAPER TO MAKE SURE VALUESS ARE RIGHT
+  # p0 = enthropy(D)
+  # df = D.sort_values(by=A_i)
+  # alpha = []
+  # gain = []
+  # for index,row in df.iterrows(): #index == l in psuedocode
+  #   alpha.append(row[A_i]) #row[A_i] = d[A_i] aka value of cont variable for that row
+  #   for j in range(k): #iterate through every class_var
+  #     if row[class_var] == c_dom[j]: #class(d) == c_j
+  #       counts[j][index] = counts[j][index - 1] + 1 #this will throw a bug when index is 0
+  #     else:
+  #       counts[j][index] = counts[j][index - 1]
+  # for index, row in df.iterrows():
+  #   counts = 0
+  #   gain.append(p0 - enthropy_val())
   return None
 
 """
