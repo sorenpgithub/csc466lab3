@@ -68,8 +68,13 @@ def selectSplittingAttribute(A, D, threshold): #information gain
   p0 = enthropy(D) #\in (0,1) -sum
   gain = [0] * len(A)
   for i, A_i in enumerate(A): #i is index, A_i is string of col name
-    p_i = enthropy_att(A_i, D)
-    gain[i] = p0 - p_i #appending the info gain for each attribute to a list
+    if A_i in categ_vars:
+      p_i = enthropy_att(A_i, D)
+       #appending the info gain for each attribute to a list
+    else:
+      x = findBestSplit(A_i, D)
+      p_i = enthropy_vals(x, A_i, D) #double check to make sure right entropy
+    gain[i] = p0 - p_i 
   m = max(gain) #fidning the maximal info gain
   if m > threshold:
     max_ind = gain.index(m) #finding the list index of the maximal info gain
@@ -85,16 +90,17 @@ def findBestSplit(A_i, D): #WONT WORK
   p0 = enthropy(D)
   df = D.sort_values(by=A_i)
   alpha = []
+  gain = []
   for index,row in df.iterrows(): #index == l in psuedocode
-    alpha.append(row[A_i])
-    for j in range(k):
-      if row[class_var] == c_dom[j]:
+    alpha.append(row[A_i]) #row[A_i] = d[A_i] aka value of cont variable for that row
+    for j in range(k): #iterate through every class_var
+      if row[class_var] == c_dom[j]: #class(d) == c_j
         counts[j][index] = counts[j][index - 1] + 1 #this will throw a bug when index is 0
       else:
         counts[j][index] = counts[j][index - 1]
   for index, row in df.iterrows():
-    counts = 
-    gain[index] = p0 - enthropy_vals()
+    counts = 0
+    gain.append(p0 - enthropy_vals())
   return None
 
 """
@@ -219,7 +225,7 @@ def get_tree(D, vars, thresh, max_depth=None):
 
 
 def initialize_global(path_file_in, rest_file_in, write_in = False):
-  global path, rest_file, write, thresh, class_var, doms
+  global path, rest_file, write, thresh, class_var, doms, categ_vars
   path = path_file_in
   rest_file = rest_file_in
   write = write_in
@@ -229,6 +235,7 @@ def initialize_global(path_file_in, rest_file_in, write_in = False):
   class_var = ret[1]
   df = ret[0]
   doms = dom_dict(df)
+  categ_vars = []#PARSE IN LIST OF CATEGORICAL VARIABLES!!!
   return(ret[0])
 
 def dom_dict(df):
