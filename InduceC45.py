@@ -15,6 +15,7 @@ returns a dataframe with only the columns that should be used while inducing the
 """
 def parser(filename,restfile): #utilize restfile, if no restfile assume None value
   #First three lines need to be parsed separately 
+  print("IN PARSER")
   with open(filename, 'r') as file:
     line1 = file.readline() #names of all columns
     line2 = file.readline() #information about the domain of each variable, −1: column is a rowId, 0: column is a numeric variable, n > 0 number of possible values of the variable
@@ -29,10 +30,17 @@ def parser(filename,restfile): #utilize restfile, if no restfile assume None val
   cols = [col.strip() for col in cols] #gets rid of white space and \n in col names
 
   class_name = str(line3).strip()
-
+  numerical =[] 
+  categorical =[]
   for i in range(len(line2_list)-1, -1, -1): #goes through the file backwards to make sure we are popping the right column
     if line2_list[i] == str(-1):
       cols.pop(i)
+    if line2_list[i] == str(0):
+      numerical.append(cols[i])
+    if line2_list[i] > str(0):
+      categorical.append(cols[i])
+
+
 
   # This (optional) file indicates which attributes of the dataset to use when inducing the decision tree. 
   #     A value of 1 means that the attribute in the corresponding position is to be used in the decision tree induction; 
@@ -56,7 +64,7 @@ def parser(filename,restfile): #utilize restfile, if no restfile assume None val
 
   df_A = pd.read_csv(filename, usecols=intersection, names=intersection, skiprows=3) #creates a dataframe with the selected columns
  
-  return (df_A, class_name)
+  return (df_A, class_name, categorical)
 
 #replace with string in 3rd row of CSV WILL BE GLOBAL
 #list of categorical variables
@@ -73,8 +81,7 @@ def selectSplittingAttribute(A, D, threshold): #information gain
        #appending the info gain for each attribute to a list
     else:
       x = findBestSplit(A_i, D)
-      p_i = enthropy_val(x, A_i, D) #double check to make sure right entropy
-      #technically being double calculated but whatever
+      p_i = enthropy_vals(x, A_i, D) #double check to make sure right entropy
     gain[i] = p0 - p_i 
   m = max(gain) #fidning the maximal info gain
   if m > threshold:
@@ -103,19 +110,6 @@ def findBestSplit(A_i, D): #WONT WORK
     counts = 0
     gain.append(p0 - enthropy_vals())
   return None
-
-def findBestSplit2(A_i, D):
-  vals = D[A_i].unique()
-  gains = []
-  p0 = enthropy(D)
-
-  for val in vals:
-   ent = enthropy_val(val, A_i, D)
-   gains.append()
-  m = max(gains) #fidning the maximal info gain
-  max_ind = gains.index(m) #finding the list index of the maximal info gain
-  return vals[max_ind]
-    
 
 """
 Identifies the most frequent class label in the column specified by class_var
@@ -157,13 +151,8 @@ def enthropy_att(A_i, D):
     sum += pr * enthropy(D_j)
   return sum
 
-def enthropy_val(alpha, A_i, D):
-  D_left = D[D[A_i] <= alpha]
-  D_right = D[D[A_i] > alpha]
-  x = D_left.shape[0] * enthropy(D_left)
-  y = D_right.shape[0] * enthropy(D_right)
-  z = D.shape[0]
-  return (x/z) + (y/z)
+def enthropy_vals(alphas, A_i, D):
+  pass
 
 """
 Helper function for edge cases
@@ -208,11 +197,18 @@ def c45(D, A, threshold, current_depth=0, max_depth=None): #going to do pandas a
     for v in doms[A_g]: #iterate over each unique value (Domain) of attribute (South, West..)
       D_v = D[D[A_g] == v] #dataframe with where attribute equals value
       if not D_v.empty: #true if D_v \neq \emptyset
-        #test
-        A_temp = A.copy()
-        A_temp.remove(A_g)
-        #print(A_temp)
-        T_v = c45(D_v, A_temp, threshold, current_depth + 1, max_depth)
+        if A_g in categorical_vars:
+          print("cat: ", A_g)
+          #test
+          A_temp = A.copy()
+          A_temp.remove(A_g)
+          #print(A_temp)
+          T_v = c45(D_v, A_temp, threshold, current_depth + 1, max_depth)
+          
+        else: #A_g is numeric
+          print("num: ", A_g)
+          T_v = c45(D_v, A, threshold, current_depth + 1, max_depth)
+        
         temp = {"edge":{"value":v}}
         #modify to contain edge value, look at lec06 example
         if "node" in T_v:
@@ -222,6 +218,7 @@ def c45(D, A, threshold, current_depth=0, max_depth=None): #going to do pandas a
         else:
           print("something is broken")
         # r["node"]["edges"].append(temp)
+
       else: #ghost node
         print("GHOST PATH")
         label_info = find_freqlab(D) #determines the most frequent class label and its proportion
@@ -244,7 +241,7 @@ def get_tree(D, vars, thresh, max_depth=None):
 
 
 def initialize_global(path_file_in, rest_file_in, write_in = False):
-  global path, rest_file, write, thresh, class_var, doms, categ_vars
+  global path, rest_file, write, thresh, class_var, doms, categ_vars, categorical_vars
   path = path_file_in
   rest_file = rest_file_in
   write = write_in
@@ -255,6 +252,7 @@ def initialize_global(path_file_in, rest_file_in, write_in = False):
   df = ret[0]
   doms = dom_dict(df)
   categ_vars = []#PARSE IN LIST OF CATEGORICAL VARIABLES!!!
+  categorical_vars = ret[2]
   return(ret[0])
 
 def dom_dict(df):
