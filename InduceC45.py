@@ -190,8 +190,8 @@ def c45(D, A, threshold, current_depth=0, max_depth=None): #going to do pandas a
 Calling the C4.5 function
 Returns the decision tree
 """
-def get_tree(D, categ_vars, thresh, max_depth=None):
-  tree = c45(D, categ_vars, thresh, 0, max_depth)
+def get_tree(D, vars, thresh, max_depth=None):
+  tree = c45(D, vars, thresh, 0, max_depth)
   return tree
 
 
@@ -228,7 +228,7 @@ def main():
       write = True
   D = initialize_global(path_file, rest_file, write) #shouldnt break anything
   
-  thresh = 0.001 #determine best value
+  thresh = 0.01 #determine best value
   categ_vars = list(D.columns)
   categ_vars.remove(class_var)
 

@@ -31,12 +31,13 @@ def cross_val(df, class_var, n): #df
     
     threshold = 0.01 #change
     dfs = []
+    accuracies = []
     dom = df[class_var].unique()
     #define correct dimensions!!!!!!!
     test_cols = list(df.columns) #column names
     test_cols.remove(class_var)
-    i= 0 
-    
+    i = 0 
+
     for fold in folds:
         test = df.iloc[fold].reset_index(drop = True)
         
@@ -48,10 +49,16 @@ def cross_val(df, class_var, n): #df
         tree =  InduceC45.get_tree(train, test_cols, threshold) #returns dict tree
         #print("tree ", i, " obtained", tree)
         classify.initialize_global(class_var, True, True) #1st True = is_training since doc asserts working with training file
-        predictions = classify.generate_preds(test, tree)[0] #returns
+        predictions = classify.generate_preds(test, tree) #returns
         #print("preds generated")
-        y_pred = pd.Series(predictions)
+        y_pred = pd.Series(predictions[0])
         y_actu = test[class_var]
+        
+        
+        count_correct = predictions[1] #may not work, but has been somewhat tested
+        accu = count_correct / len(y_pred) #proportion of correct
+        accuracies.append(accu)
+
 
         df_confusion = pd.crosstab(y_actu, y_pred,rownames=['Actual'], colnames=['Predicted'] )
         df_confusion = df_confusion.reindex(index = dom, columns= dom, fill_value = 0)
@@ -61,57 +68,48 @@ def cross_val(df, class_var, n): #df
         #train the model
         i += 1
 
-    result = dfs[0]
+    conf_mat = dfs[0]
     #print("res"+str(result)) 
     if len(dfs) > 1:
         for temp in dfs[1:]:
-            result += temp
+            conf_mat += temp
 
     #result = pd.concat([result, row_tot.rename('Row Total')], axis=1)
     #result = pd.concat([result, col_tot.rename('Column Total')])
-    result.loc['Row Total']= result.sum()
-    result['Col Total'] = result.sum(axis=1)
-
-    return result
+    conf_mat.loc['Row Total']= conf_mat.sum()
+    conf_mat['Col Total'] = conf_mat.sum(axis=1)
+    
+    return (conf_mat, np.mean(accuracies))
 
 
 
 """
 """
 def output(temp):
-    pass
-    # #https://stackoverflow.com/questions/69916525/easy-way-to-extract-common-measures-such-as-accuracy-precision-recall-from-3x3
-    # cm = conf_matrix.to_numpy()
-    # diag = cm.diagonal()[:-1]
-
-    # accuracy  = diag / cm[ -1, -1]
-    # precision = diag / cm[  dim,:-1]
-    # recall    = diag / cm[:-1,  dim]
-    # f_score   = 2 * precision * recall / (precision + recall)
-
-    # out = pd.DataFrame({'Accuracy': accuracy, 
-    #                     'Precision': precision, 
-    #                     'Recall': recall,
-    #                     'F-score': f_score}).round(2)
+    for out in temp:
+        print(out)
 
 """
 Calculates and returns the accuracy, precision and recall
 """
-def metrics(cross_ret):
+def metrics(cross_ret): #(conf_matrix, mean accuracies)
     #ACCURACY 
     # = (TP + TN) / (TP + TN + FP + FN)
-    total_conf_matrix_array = cross_ret.to_numpy() #converting the confusion matrix to a numpy array
+    conf = cross_ret[0]
+    total_conf_matrix_array = conf.to_numpy() #converting the confusion matrix to a numpy array
     conf_matrix_array = total_conf_matrix_array[:-1, :-1] #excluding the total rows/columns
     TP = np.diag(conf_matrix_array) #
     accuracy = TP.sum() / conf_matrix_array.sum()
-    print("")
-    print("Accuracy: " +str(accuracy*100) + "%")
+    temp = []
+    temp.append(conf.to_string())
+    temp.append("Overall Accuracy: " +str(accuracy*100) + "%")
+    temp.append("Average Accuracy: " + str(cross_ret[1]*100) + "%")
 
     #PRECISION & RECALL 
     # --> fine for this assignment, report it for one of the classes (?)
     precision = {} #Precision = TP / (TP + FP) --> vertically
     recall = {}  #Recall = TP / (TP + FN) --> Horisontolly
-    class_names = cross_ret.index.tolist()[:-1]  # Exclude the 'Row Total' label
+    class_names = conf.index.tolist()[:-1]  # Exclude the 'Row Total' label
 
     for j in range(len(TP)): 
         nom = TP[j] #TP
@@ -129,8 +127,11 @@ def metrics(cross_ret):
             recall[class_names[j]] = "Recall for " + str(class_names[j]) + " = " + str(0) + "%"
 
 
-    print(precision)
-    print(recall) 
+    temp.append(precision)
+    temp.append(recall) 
+
+
+    return temp
 
 
 """
@@ -154,8 +155,8 @@ def main():
     #2nd true is silent since we don't want outputs, should be the case
   
     cross_ret = cross_val(D, class_var, n)
-    sys.stdout.write(cross_ret.to_string())
-    metrics(cross_ret)
+    outs = metrics(cross_ret)
+    output(outs)
 
 
 if __name__ == "__main__":

@@ -112,6 +112,7 @@ def output_stuff(D, preds, correct):
   output.append(df_confusion.to_string())
   return output
 
+
 def initialize_global(class_var_in, training_in, silent_in = True): 
   global class_var, is_training_csv, silent
   #Dataframe with all observations, currently assuming is training set
