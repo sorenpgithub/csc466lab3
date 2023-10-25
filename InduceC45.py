@@ -171,61 +171,73 @@ from a dataset D based on a list of attributes A and a threshold value for infor
 Returns the (sub)tree T rooted at the current node
 """
 def c45(D, A, threshold, current_depth=0, max_depth=None): #going to do pandas approach, assume D is df and A is list of col names
+  print("in C45")
+  print("A: ", A)
   
   if max_depth is not None and current_depth == max_depth:
     return create_node(D)
   
   #Edge case 1
   if D[class_var].nunique() == 1:
+    print("edge case 1")
     #redundant to find mode if only one class label but bug proof!!
     T = create_node(D) #following exclusively psuedo code
 
   #Edge case 2
   elif not A:
+    print("edge case 2")
     #redundant to find mode if only one class label but bug proof!!
     T = create_node(D)
 
   #"Normal" case
   else:
+    print("in normal case")
     A_g = selectSplittingAttribute(A, D, threshold) #string of column name
     if A_g is None:
+      print("A_g is None")
       T = create_node(D)
     else:
-     r = {"node": {"var":A_g, "edges":[]} } #dblcheck with psuedo code
-     T = r
-    #reference vs assignment are very delicate, triple check alg
-    for v in doms[A_g]: #iterate over each unique value (Domain) of attribute (South, West..)
-      D_v = D[D[A_g] == v] #dataframe with where attribute equals value
-      if not D_v.empty: #true if D_v \neq \emptyset
-        if A_g in categorical_vars:
-          print("cat: ", A_g)
-          #test
-          A_temp = A.copy()
-          A_temp.remove(A_g)
-          #print(A_temp)
-          T_v = c45(D_v, A_temp, threshold, current_depth + 1, max_depth)
+      print("in else")
+      r = {"node": {"var":A_g, "edges":[]} } #dblcheck with psuedo code
+      T = r
+      #reference vs assignment are very delicate, triple check alg
+      for v in doms[A_g]: #iterate over each unique value (Domain) of attribute (South, West..)
+        print("v: ", v)
+        print("doms_ag: ", doms[A_g])
+        D_v = D[D[A_g] == v] #dataframe with where attribute equals value
+        if not D_v.empty: #true if D_v \neq \emptyset
+          print("D_v is not empty")
+          if A_g in categorical_vars:
+            print("A_g is categorical ", A_g)
+            print("cat: ", A_g)
+            #test
+            A_temp = A.copy()
+            A_temp.remove(A_g)
+            #print(A_temp)
+            T_v = c45(D_v, A_temp, threshold, current_depth + 1, max_depth)
+            
+          else: #A_g is numeric
+            print("A_g is numeric ", A_g)
+            print("num: ", A_g)
+            T_v = c45(D_v, A, threshold, current_depth + 1, max_depth)
           
-        else: #A_g is numeric
-          print("num: ", A_g)
-          T_v = c45(D_v, A, threshold, current_depth + 1, max_depth)
-        
-        temp = {"edge":{"value":v}}
-        #modify to contain edge value, look at lec06 example
-        if "node" in T_v:
-          temp["edge"]["node"] = T_v["node"]
-        elif "leaf" in T_v:
-          temp["edge"]["leaf"] = T_v["leaf"]
-        else:
-          print("something is broken")
-        # r["node"]["edges"].append(temp)
+          temp = {"edge":{"value":v}}
+          #modify to contain edge value, look at lec06 example
+          if "node" in T_v:
+            temp["edge"]["node"] = T_v["node"]
+          elif "leaf" in T_v:
+            temp["edge"]["leaf"] = T_v["leaf"]
+          else:
+            print("something is broken")
+          # r["node"]["edges"].append(temp)
 
-      else: #ghost node
-        print("GHOST PATH")
-        label_info = find_freqlab(D) #determines the most frequent class label and its proportion
-        ghost_node = {"leaf":{}} #initialize a leaf node
-        ghost_node["leaf"]["decision"] = label_info[0] #set the decision to the most frequent class label
-        ghost_node["leaf"]["p"] = label_info[1] #set the probability or proportion
-        temp = {"edge": {"value": v, "leaf": ghost_node["leaf"]}}
+        else: #ghost node
+          print("GHOST PATH")
+          label_info = find_freqlab(D) #determines the most frequent class label and its proportion
+          ghost_node = {"leaf":{}} #initialize a leaf node
+          ghost_node["leaf"]["decision"] = label_info[0] #set the decision to the most frequent class label
+          ghost_node["leaf"]["p"] = label_info[1] #set the probability or proportion
+          temp = {"edge": {"value": v, "leaf": ghost_node["leaf"]}}
                 
       r["node"]["edges"].append(temp)
   return T
@@ -278,11 +290,14 @@ def main():
   thresh = 0.01 #determine best value
   #categ_vars = list(D.columns)
   #categ_vars.remove(class_var)
+  print("Categorical vars: ", categorical_vars)
 
   categorical_vars.remove(class_var)
+  all_vars = list(D.columns)
+  all_vars.remove(class_var)
 
   max_tree_depth = 2
-  tree = get_tree(D, categorical_vars, thresh, max_tree_depth)
+  tree = get_tree(D, all_vars, thresh, max_tree_depth)
   
   out = {"dataset":path} #be careful if using path instead of filename
   out.update(tree)
