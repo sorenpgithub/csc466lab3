@@ -12,11 +12,12 @@ import json
 import numpy as np
 import classify
 import InduceC45
+import randomForest
 
 """
 
 """
-def cross_val(df, class_var, n, silent): #df
+def cross_val(df, class_var, n, silent, numTrees): #df
     indices = np.arange(df.shape[0])
     np.random.shuffle(indices)
     nocross = False
@@ -46,13 +47,20 @@ def cross_val(df, class_var, n, silent): #df
         else:
             train = df.drop(fold).reset_index(drop=True)
         #print("in fold", i)
-        tree =  InduceC45.get_tree(train, test_cols, threshold) #returns dict tree
-        #print("tree ", i, " obtained", tree)
-        classify.initialize_global(class_var, True, silent) #1st True = is_training since doc asserts working with training file
-        predictions = classify.generate_preds(test, tree) #returns
-        #print("preds generated")
-        y_pred = pd.Series(predictions[0])
         y_actu = test[class_var]
+        classify.initialize_global(class_var, True, silent)
+        for n in numTrees:
+            if numTrees > 1: #AKA Forest= True
+                train = randomForest.rand_data(train, class_var) 
+                test_cols = list(train.columns) #column names
+                test_cols.remove(class_var)
+            tree =  InduceC45.get_tree(train, test_cols, threshold) #returns dict tree
+
+            #print("tree ", i, " obtained", tree)
+ #1st True = is_training since doc asserts working with training file
+            predictions = classify.generate_preds(test, tree) #returns
+        #print("preds generated")
+            y_pred = pd.Series(predictions[0])
         
         
         count_correct = predictions[1] #may not work, but has been somewhat tested
@@ -154,7 +162,7 @@ def main():
  #1st True = is_training since doc asserts working with training file
     #2nd true is silent since we don't want outputs, should be the case
   
-    cross_ret = cross_val(D, class_var, n, True)
+    cross_ret = cross_val(D, class_var, n, True, 1)
     outs = metrics(cross_ret)
     output(outs)
 

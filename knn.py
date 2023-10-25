@@ -23,7 +23,9 @@ def mann_dist(d1, d2):
 def encode_df(D):
     pass
 
-def init_centroids(D, k);
+def init_centroids(D, k):
+    #Pick k random points from D
+    # 
     pass
 
 def main():

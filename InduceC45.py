@@ -81,7 +81,7 @@ def selectSplittingAttribute(A, D, threshold): #information gain
        #appending the info gain for each attribute to a list
     else:
       x = findBestSplit(A_i, D)
-      p_i = enthropy_vals(x, A_i, D) #double check to make sure right entropy
+      p_i = enthropy_val(x, A_i, D) #double check to make sure right entropy
     gain[i] = p0 - p_i 
   m = max(gain) #fidning the maximal info gain
   if m > threshold:
@@ -110,7 +110,25 @@ def findBestSplit(A_i, D): #WONT WORK
   #   counts = 0
   #   gain.append(p0 - enthropy_val())
   return None
+def findBestSplit2(A_i, D):
+  vals = D[A_i].unique()
+  gains = []
+  p0 = enthropy(D)
 
+  for val in vals:
+   ent = enthropy_val(val, A_i, D)
+   gains.append()
+  m = max(gains) #fidning the maximal info gain
+  max_ind = gains.index(m) #finding the list index of the maximal info gain
+  return vals[max_ind]
+
+def enthropy_val(alpha, A_i, D):
+  D_left = D[D[A_i] <= alpha]
+  D_right = D[D[A_i] > alpha]
+  x = D_left.shape[0] * enthropy(D_left)
+  y = D_right.shape[0] * enthropy(D_right)
+  z = D.shape[0]
+  return (x/z) + (y/z)
 """
 Identifies the most frequent class label in the column specified by class_var
 Returns both the label and its probability

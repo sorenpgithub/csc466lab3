@@ -10,24 +10,24 @@ import random
 def parser(path):
     pass
 
-def build_data(D, m, k, class_var): #D is pandas DF, rest is defined
-    df = D.sample(k, replace = True)
+def rand_data(D, class_var): #D is pandas DF, rest is defined
+    df = D.sample(numDataPoints, replace = True)
     cols = D.columns
     cols.remove(class_var)
-    newcols = random.sample(cols, m)
+    newcols = random.sample(cols, numAttributes)
     newcols.append(class_var)
     df = df[newcols]
     return df
 
 def main():
+    global class_var, numAttributes, numDataPoints
     ret = parser
     D = ret[0]
     class_var = [1]
     numAttributes = sys.argv[2]
     numDataPoints = sys.argv[3]
     numTrees = sys.argv[4]
-    build_data(D, numAttributes, numDataPoints, class_var)
-    evaluate(D, numTrees, numTrees, False)
+    evaluate.cross_val(D, class_var, 10, False, numTrees) #df, class_var, n, silent, numTrees
 
 
 if __name__ == "__main__":
