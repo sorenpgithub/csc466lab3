@@ -125,7 +125,8 @@ def findBestSplit2(A_i, D):
 
   for val in vals:
    ent = enthropy_val(val, A_i, D)
-   gains.append(ent)
+   gain = p0 - ent
+   gains.append(gain)
   m = max(gains) #fidning the maximal info gain
   max_ind = gains.index(m) #finding the list index of the maximal info gain
   return vals[max_ind]
