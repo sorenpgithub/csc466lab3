@@ -200,10 +200,10 @@ from a dataset D based on a list of attributes A and a threshold value for infor
 Returns the (sub)tree T rooted at the current node
 """
 def c45(D, A, threshold, current_depth=0, max_depth=None): #going to do pandas approach, assume D is df and A is list of col names
-  print("in C45")
-  print("A: ", A)
-  print(D[class_var])
-  print(D[class_var].nunique())
+  #print("in C45")
+  #print("A: ", A)
+  #print(D[class_var])
+  #print(D[class_var].nunique())
   
   if max_depth is not None and current_depth == max_depth:
     print("bug")
@@ -211,13 +211,13 @@ def c45(D, A, threshold, current_depth=0, max_depth=None): #going to do pandas a
   
   #Edge case 1
   if D[class_var].nunique() == 1:
-    print("edge case 1")
+    #print("edge case 1")
     #redundant to find mode if only one class label but bug proof!!
     T = create_node(D) #following exclusively psuedo code
 
   #Edge case 2
   elif not A:
-    print("edge case 2")
+    #print("edge case 2")
     #redundant to find mode if only one class label but bug proof!!
     T = create_node(D)
 
@@ -225,7 +225,7 @@ def c45(D, A, threshold, current_depth=0, max_depth=None): #going to do pandas a
   else:
     A_g = selectSplittingAttribute(A, D, threshold) #string of column name
     if A_g is None:
-      print("A_g none")
+      #print("A_g none")
       T = create_node(D)
     else:
       r = {"node": {"var":A_g, "edges":[]} } #dblcheck with psuedo code
@@ -254,7 +254,7 @@ def c45(D, A, threshold, current_depth=0, max_depth=None): #going to do pandas a
             print("something is broken")
           # r["node"]["edges"].append(temp)
         else: #ghost node
-          print("GHOST PATH")
+          #print("GHOST PATH")
           label_info = find_freqlab(D) #determines the most frequent class label and its proportion
           ghost_node = {"leaf":{}} #initialize a leaf node
           ghost_node["leaf"]["decision"] = label_info[0] #set the decision to the most frequent class label

@@ -20,7 +20,11 @@ import randomForest
 def find_mode(row): #minor helper func
     return row.mode().iloc[0]  #will pick smallest if tied value, can be used to debug
 
-def cross_val(df, class_var, n, silent, numTrees): #df
+def cross_val(df, class_var, n, silent, forestMeta = []): #forestMeta = [numTrees, numAtt, numData]
+    numTrees = 1
+    if forestMeta: #if forestMeta = [] \implies no forest
+        numTrees = forestMeta[0]
+
     indices = np.arange(df.shape[0])
     np.random.shuffle(indices)
     nocross = False
@@ -54,9 +58,9 @@ def cross_val(df, class_var, n, silent, numTrees): #df
         y_actu = test[class_var]
         classify.initialize_global(class_var, True, silent)
         pred_df = pd.DataFrame({"actu": y_actu})
-        for n in range(numTrees):
+        for n in range(numTrees): #should be 1 if running normally
             if numTrees > 1: #AKA Forest= True
-                train = randomForest.rand_data(train, class_var) 
+                train = randomForest.rand_data(train, class_var, forestMeta[1], forestMeta[2]) #forestMeta = [numTrees, numAtt, num]
                 test_cols = list(train.columns) #column names
                 test_cols.remove(class_var)
             tree =  InduceC45.get_tree(train, test_cols, threshold) #returns dict tree
@@ -67,7 +71,7 @@ def cross_val(df, class_var, n, silent, numTrees): #df
         #print("preds generated")
             y_pred = pd.Series(predictions[0])
             if numTrees > 1:
-                col_name = tree + str(n) 
+                col_name = "T" + str(n) 
                 pred_df[col_name] = y_pred
         
         if numTrees > 1: #not needed but may be easier
