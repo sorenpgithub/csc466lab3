@@ -17,6 +17,9 @@ import randomForest
 """
 
 """
+def find_mode(row): #minor helper func
+    return row.mode().iloc[0]  #will pick smallest if tied value, can be used to debug
+
 def cross_val(df, class_var, n, silent, numTrees): #df
     indices = np.arange(df.shape[0])
     np.random.shuffle(indices)
@@ -30,6 +33,7 @@ def cross_val(df, class_var, n, silent, numTrees): #df
     else:
         folds = np.array_split(indices, n) #k folds for cross validation
     
+
     threshold = 0.01 #change
     dfs = []
     accuracies = []
@@ -49,7 +53,8 @@ def cross_val(df, class_var, n, silent, numTrees): #df
         #print("in fold", i)
         y_actu = test[class_var]
         classify.initialize_global(class_var, True, silent)
-        for n in numTrees:
+        pred_df = pd.DataFrame({"actu": y_actu})
+        for n in range(numTrees):
             if numTrees > 1: #AKA Forest= True
                 train = randomForest.rand_data(train, class_var) 
                 test_cols = list(train.columns) #column names
@@ -61,9 +66,17 @@ def cross_val(df, class_var, n, silent, numTrees): #df
             predictions = classify.generate_preds(test, tree) #returns
         #print("preds generated")
             y_pred = pd.Series(predictions[0])
+            if numTrees > 1:
+                col_name = tree + str(n) 
+                pred_df[col_name] = y_pred
         
-        
-        count_correct = predictions[1] #may not work, but has been somewhat tested
+        if numTrees > 1: #not needed but may be easier
+            pred_df['mode'] = pred_df.apply(find_mode, axis=1)
+            y_pred = pred_df["mode"]
+            mask = [a == b for a, b in zip(y_pred, y_actu)] #gross but should work
+            count_correct = sum(mask)
+        else:
+            count_correct = predictions[1]
         accu = count_correct / len(y_pred) #proportion of correct
         accuracies.append(accu)
 
