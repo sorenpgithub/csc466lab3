@@ -76,18 +76,18 @@ def selectSplittingAttribute(A, D, threshold): #information gain
   p0 = enthropy(D) #\in (0,1) -sum
   gain = [0] * len(A)
   for i, A_i in enumerate(A): #i is index, A_i is string of col name
-    print(A_i)
+    #print(A_i)
     if A_i in categorical_vars:
-      print("is categ")
+      #print("is categ")
       p_i = enthropy_att(A_i, D)
        #appending the info gain for each attribute to a list
     else:
       print("not categ")
       x = findBestSplit2(A_i, D)
       p_i = enthropy_val(x, A_i, D) #double check to make sure right entropy
-    print(p0, p_i)
+    #print(p0, p_i)
     gain[i] = p0 - p_i 
-  print(gain)
+  #print(gain)
   m = max(gain) #fidning the maximal info gain
   if m > threshold:
     max_ind = gain.index(m) #finding the list index of the maximal info gain
@@ -285,7 +285,7 @@ def initialize_global(path_file_in, rest_file_in, write_in = False):
   class_var = ret[1]
   df = ret[0]
   doms = dom_dict(df)
-  print(doms)
+  #print(doms)
   #categ_vars = []#PARSE IN LIST OF CATEGORICAL VARIABLES!!!
   categorical_vars = ret[2]
   return(ret[0])

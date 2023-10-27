@@ -7,6 +7,8 @@ import InduceC45
 import evaluate
 import random
 
+# python3 randomForest.py adult+stretch.csv 3 4 50
+
 def rand_data(D, class_var, numAtt, numData): #D is pandas DF, rest is defined
     df = D.sample(numData, replace = True)
     print(df)
@@ -29,7 +31,7 @@ def main():
     numTrees = int(sys.argv[4])
     InduceC45.initialize_global(path, restfile, False) #may not work but needed for evaluate.crossval to run
     folds = 2 #should be fixed to 10
-    conf = evaluate.cross_val(D, class_var, 10, False, [numTrees, numAttributes, numDataPoints]) #df, class_var, n, silent, numTrees
+    conf = evaluate.cross_val(D, class_var, folds, False, [numTrees, numAttributes, numDataPoints]) #df, class_var, n, silent, numTrees
     print(conf)
 
 

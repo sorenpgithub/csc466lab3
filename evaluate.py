@@ -56,14 +56,16 @@ def cross_val(df, class_var, n, silent, forestMeta = []): #forestMeta = [numTree
             train = df.drop(fold).reset_index(drop=True)
         #print("in fold", i)
         y_actu = test[class_var]
-        classify.initialize_global(class_var, True, silent)
+        classify.initialize_global(class_var, True, True)
         pred_df = pd.DataFrame({"actu": y_actu})
+        temptrain = train.copy()
         for n in range(numTrees): #should be 1 if running normally
+            print(temptrain)
             if numTrees > 1: #AKA Forest= True
-                train = randomForest.rand_data(train, class_var, forestMeta[1], forestMeta[2]) #forestMeta = [numTrees, numAtt, num]
-                test_cols = list(train.columns) #column names
+                temptrain = randomForest.rand_data(train, class_var, forestMeta[1], forestMeta[2]) #forestMeta = [numTrees, numAtt, num]
+                test_cols = list(temptrain.columns) #column names
                 test_cols.remove(class_var)
-            tree =  InduceC45.get_tree(train, test_cols, threshold) #returns dict tree
+            tree =  InduceC45.get_tree(temptrain, test_cols, threshold) #returns dict tree
 
             #print("tree ", i, " obtained", tree)
  #1st True = is_training since doc asserts working with training file

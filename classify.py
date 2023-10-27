@@ -46,7 +46,7 @@ def parser_check(filename): #utilize restfile, if no restfile assume None value
 Traverses the decision tree and makes predictions for a given dataset D based on the structure of the provided tree
 Returns a tuple containing the list of predictions and the count of correct predictions
 """
-def generate_preds(D, tree):
+def generate_preds(D, tree, class_var):
   df_A = D.drop(class_var, axis = 1)#makes new df, not inplace
   pred = []
   correct = 0
@@ -96,7 +96,7 @@ def generate_preds(D, tree):
 """
 
 """
-def output_stuff(D, preds, correct):
+def output_stuff(D, preds, correct, class_var):
   output = []
   y_pred = pd.Series(preds)
   y_actu = D[class_var]
@@ -114,9 +114,9 @@ def output_stuff(D, preds, correct):
 
 
 def initialize_global(class_var_in, training_in, silent_in = True): 
-  global class_var, is_training_csv, silent
+  global is_training_csv, silent
   #Dataframe with all observations, currently assuming is training set
-  class_var = class_var_in #string of colname of observed vals, could be None if not training
+  #  #string of colname of observed vals, could be None if not training
   is_training_csv = training_in #tbd on slack response
   silent = silent_in #if each classification prints
 #should be able to directly call generate_preds after initializing
@@ -133,13 +133,15 @@ def main():
      
   #initializing stuff
   ret = parser_check(sys.argv[1])
-  initialize_global(ret[1], True, silent_out) 
   #drops class variable without c
   D = ret[0]
+  class_var = ret[1]
+  initialize_global(class_var, True, silent_out) 
+
   res = generate_preds(D, tree) #check if first node is leaf before calling!
   preds = res[0]
   correct = res[1]
-  outs = output_stuff(D, preds, correct)
+  outs = output_stuff(D, preds, correct, class_var)
   for out in outs:
     sys.stdout.write(str(out) + "\n")
 
