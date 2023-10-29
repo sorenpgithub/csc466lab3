@@ -95,7 +95,7 @@ def main():
     preds = knn(D, class_var, k, categ)
     mask = [a == b for a, b in zip(preds, D[class_var])] #gross but should work
     count_correct = sum(mask)
-    outs = output_stuff(D, preds, count_correct, class_var)
+    outs = classify.output_stuff(D, preds, count_correct, class_var)
     for out in outs:
         sys.stdout.write(str(out) + "\n")
 
