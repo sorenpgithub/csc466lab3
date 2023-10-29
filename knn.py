@@ -9,6 +9,10 @@ import numpy as np
 import json
 import classify
 
+# PARAMETERS TO CONSIDER: 
+## no neighbors K
+## distance metrics
+## weights
 
 """
 
@@ -21,15 +25,17 @@ def knn(D, class_var, k, categorical): #assuming D is encoded and that all cols 
     for i in range(D.shape[0]):
         dists = []
         ite = 0
-        D_dum = pd.get_dummies(D, columns = categorical)
-        curr = D_dum.drop(class_var, axis = 1).iloc[i].to_numpy().astype(float)
-        print("HEJ ", curr)
-        matrix = D_dum.drop(class_var, axis = 1).drop(i).to_numpy().astype(float)
-
-        
+        D_wo_class = D.drop(class_var, axis = 1)
+        D_dum = pd.get_dummies(D_wo_class, columns = categorical).astype(int)
+        print("D_DUM: ", D_dum)
+        curr = D_dum.iloc[i].to_numpy()
+        matrix = D_dum.drop(i).to_numpy()
 
         for obs in matrix:
             dists.append(euclid(curr, obs))
+            #dists.append(manhattan(curr, obs))
+            #dists.append(cosine(curr, obs))
+
             ite += 1
        
         dists = np.array(dists)
@@ -44,9 +50,13 @@ def mann(n1, n2): #convert to numpy arrays
     return abs(n1 - n2)
 
 def euclid(n1, n2):
-    print("n1: ", n1)
-    print("n2: ", n2)
     return np.linalg.norm(n1 - n2) 
+
+def manhattan(n1, n2):
+    return np.linalg.norm(n1 - n2, ord=1) 
+
+def cosine(n1, n2):
+    return np.dot(n1,n2) / (np.linalg.norm(n1)*np.linalg.norm(n2))
 
 def encode_df(D): #convert categ to numeric and normalize numeric!!!!!!!!!!!
     dummies = pd.get_dummies(D)
