@@ -64,6 +64,10 @@ def encode_df(D, categ, class_var): #convert categ to numeric and normalize nume
     D_wo_class = D.drop(class_var, axis = 1)
     D_dum = pd.get_dummies(D_wo_class, columns = categ)
     D_dum = D_dum * 1 #makes sure that true and false are converted into 1 and 0
+
+    # Convert all columns to float
+    for col in D_dum.columns:
+        D_dum[col] = pd.to_numeric(D_dum[col], errors='coerce')
 #df = df.apply(pd.to_numeric, errors='coerce')
     return D_dum
 
