@@ -111,6 +111,7 @@ def cross_val(df, class_var, n, silent, forestMeta = []): #forestMeta = [numTree
 
 
 """
+Simple helper function that prints out list of outputs
 """
 def output(temp):
     for out in temp:
@@ -160,9 +161,10 @@ def metrics(cross_ret): #(conf_matrix, mean accuracies)
 
 
     return temp
-
+"""
+Simple write out function to path.csv \to path.out
+"""
 def write_out(path, outs):
-    path = "iris+data.csv"
     temp = path.split(".")[:-1]
     name = '.'.join(temp) + ".out"
     with open(name, 'w') as file:

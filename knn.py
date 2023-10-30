@@ -16,7 +16,7 @@ import InduceC45
 ## weights
 
 """
-
+Basic KNN classifie
 """
 def knn(D, class_var, k, categ): #assuming D is encoded and that all cols \neq class are being used
     preds = []
@@ -47,8 +47,10 @@ def knn(D, class_var, k, categ): #assuming D is encoded and that all cols \neq c
 
     return preds
 
-def mann(n1, n2): #convert to numpy arrays 
-    return abs(n1 - n2)
+
+"""
+Below are straightforward distance metrics and scaling techniques
+"""
 
 def euclid(n1, n2):
     return np.linalg.norm(n1 - n2) 
@@ -64,6 +66,11 @@ def min_max_scaling(col):
     max_val = col.max()
     scaled_column = (col - min_val) / (max_val - min_val)
     return scaled_column
+
+"""
+Encodes Dataframe by dummifying categorical variables
+Currently hardcode to encode in min-max-scaling and onehot encoding methods
+"""
 def encode_df(D, categ, class_var): #convert categ to numeric and normalize numeric!!!!!!!!!!!
     if len(categ) != 0:
         categ.remove(class_var) #if categorical after this is empty --> only numerical (no dummification needed)
@@ -78,6 +85,10 @@ def encode_df(D, categ, class_var): #convert categ to numeric and normalize nume
 #df = df.apply(pd.to_numeric, errors='coerce')
     return D_dum
 
+
+"""
+Copied from evaluate, calculates error, accuracy and other metrics
+"""
 def output_stuff(D, preds, correct, class_var):
   output = []
   y_pred = pd.Series(preds)
@@ -94,7 +105,9 @@ def output_stuff(D, preds, correct, class_var):
   output.append(df_confusion.to_string())
   return output
 
-
+"""
+Main Function
+"""
 def main():
     ret = InduceC45.parser(sys.argv[1])
     D = ret[0] #need to decide how to encode THIS!!
