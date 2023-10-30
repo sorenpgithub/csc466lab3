@@ -161,6 +161,15 @@ def metrics(cross_ret): #(conf_matrix, mean accuracies)
 
     return temp
 
+def write_out(path, outs):
+    path = "iris+data.csv"
+    temp = path.split(".")[:-1]
+    name = '.'.join(temp) + ".out"
+    with open(name, 'w') as file:
+    # Write your output to the file
+        for out in outs:
+            file.write(str(out)+ "\n")
+
 
 """
 Main Function
@@ -185,6 +194,7 @@ def main():
     cross_ret = cross_val(D, class_var, n, True, [1])
     outs = metrics(cross_ret)
     output(outs)
+    write_out(path, outs)
 
 
 if __name__ == "__main__":

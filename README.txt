@@ -11,18 +11,11 @@ validation.py:
 
 ***NOTE***
 THIS PROGRAM IS NOT COMPLETE
-evaluate has a major issue due to the structure of how variables are transfered to InduceC45. evaluate will not terminate due to 'Ghost nodes' not being properly implemented with the domain of A_g. 
-
-Additionally, there is a slight issue with probabilities for presumably the same reason. Overfitting is major issue, such that classify is often returning perfect scores. Upon visual inspection tree apears to be of proper format but further testing required.
-
-RestFiles are not fully properly implemted and the parser needs improvement on it's functionality and ability to handle edge cases. 
 
 The strucutre of the functions and usage of global variables gives rise to concern as well. Overall this program needs to be cleaned up.
 
 Plans:
 -Add f-measure and average accuracy!!
--Add ability to handle continuous variables!!!
--Fix ghost node evaluation issue!!!
 -Test and finalize Nocross and allbutone functionality (UNTESTED)
 -Add information gain RATIO along with just gain
 -Further code commenting and clean up appearence

@@ -8,6 +8,7 @@ import pandas as pd
 import numpy as np 
 import json
 import classify
+import InduceC45
 
 # PARAMETERS TO CONSIDER: 
 ## no neighbors K
@@ -58,6 +59,11 @@ def manhattan(n1, n2):
 def cosine(n1, n2):
     return np.dot(n1,n2) / (np.linalg.norm(n1)*np.linalg.norm(n2))
 
+def min_max_scaling(col):
+    min_val = col.min()
+    max_val = col.max()
+    scaled_column = (col - min_val) / (max_val - min_val)
+    return scaled_column
 def encode_df(D, categ, class_var): #convert categ to numeric and normalize numeric!!!!!!!!!!!
     if len(categ) != 0:
         categ.remove(class_var) #if categorical after this is empty --> only numerical (no dummification needed)
@@ -66,8 +72,9 @@ def encode_df(D, categ, class_var): #convert categ to numeric and normalize nume
     D_dum = D_dum * 1 #makes sure that true and false are converted into 1 and 0
 
     # Convert all columns to float
-    for col in D_dum.columns:
+    for col in D_dum.columns: #should use .apply() but life goes on
         D_dum[col] = pd.to_numeric(D_dum[col], errors='coerce')
+        D_dum[col] = min_max_scaling(D_dum[col])
 #df = df.apply(pd.to_numeric, errors='coerce')
     return D_dum
 
@@ -89,7 +96,7 @@ def output_stuff(D, preds, correct, class_var):
 
 
 def main():
-    ret = classify.parser_check(sys.argv[1])
+    ret = InduceC45.parser(sys.argv[1])
     D = ret[0] #need to decide how to encode THIS!!
     class_var = ret[1]
     categ = ret[2]

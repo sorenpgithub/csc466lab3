@@ -1,0 +1,10 @@
+Predicted        Iris-setosa  Iris-versicolor  Iris-virginica  Col Total
+Actual                                                                  
+Iris-setosa               48                0               2         50
+Iris-versicolor            2               42               6         50
+Iris-virginica             1                7              42         50
+Row Total                 51               49              50        150
+Overall Accuracy: 88.0%
+Average Accuracy: 88.00000000000001%
+{'Iris-setosa': 'Precision for Iris-setosa = 94.11764705882352%', 'Iris-versicolor': 'Precision for Iris-versicolor = 85.71428571428571%', 'Iris-virginica': 'Precision for Iris-virginica = 84.0%'}
+{'Iris-setosa': 'Recall for Iris-setosa = 96.0%', 'Iris-versicolor': 'Recall for Iris-versicolor = 84.0%', 'Iris-virginica': 'Recall for Iris-virginica = 84.0%'}

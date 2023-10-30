@@ -13,7 +13,7 @@ import json
 Parsing the datafile and if provided also the restriction file
 returns a dataframe with only the columns that should be used while inducing the decision tree
 """
-def parser(filename,restfile): #utilize restfile, if no restfile assume None value
+def parser(filename,restfile = None): #utilize restfile, if no restfile assume None value
   #First three lines need to be parsed separately 
   print("IN PARSER")
   with open(filename, 'r') as file:
