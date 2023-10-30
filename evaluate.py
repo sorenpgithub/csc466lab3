@@ -69,7 +69,7 @@ def cross_val(df, class_var, n, silent, forestMeta = []): #forestMeta = [numTree
 
             #print("tree ", i, " obtained", tree)
  #1st True = is_training since doc asserts working with training file
-            predictions = classify.generate_preds(test, tree) #returns
+            predictions = classify.generate_preds(test, tree, class_var) #returns
         #print("preds generated")
             y_pred = pd.Series(predictions[0])
             if numTrees > 1:
@@ -158,6 +158,7 @@ def metrics(cross_ret): #(conf_matrix, mean accuracies)
     temp.append(recall) 
 
 
+
     return temp
 
 
@@ -181,7 +182,7 @@ def main():
  #1st True = is_training since doc asserts working with training file
     #2nd true is silent since we don't want outputs, should be the case
   
-    cross_ret = cross_val(D, class_var, n, True, 1)
+    cross_ret = cross_val(D, class_var, n, True, [1])
     outs = metrics(cross_ret)
     output(outs)
 
