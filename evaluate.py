@@ -20,7 +20,7 @@ import randomForest
 def find_mode(row): #minor helper func
     return row.mode().iloc[0]  #will pick smallest if tied value, can be used to debug
 
-def cross_val(df, class_var, n, silent, forestMeta = []): #forestMeta = [numTrees, numAtt, numData]
+def cross_val(df, class_var, n, silent, forestMeta = [], threshold = 0.5): #forestMeta = [numTrees, numAtt, numData]
     numTrees = 1
     if forestMeta: #if forestMeta = [] \implies no forest
         numTrees = forestMeta[0]
@@ -38,7 +38,7 @@ def cross_val(df, class_var, n, silent, forestMeta = []): #forestMeta = [numTree
         folds = np.array_split(indices, n) #k folds for cross validation
     
 
-    threshold = 0.5 #change
+#change
     dfs = []
     accuracies = []
     dom = df[class_var].unique()
@@ -166,7 +166,7 @@ Simple write out function to path.csv \to path.out
 """
 def write_out(path, outs):
     temp = path.split(".")[:-1]
-    name = '.'.join(temp) + ".out"
+    name = '.'.join(temp) + "-results.out"
     with open(name, 'w') as file:
     # Write your output to the file
         for out in outs:
@@ -178,12 +178,15 @@ Main Function
 """
 def main():
     n = 5
+    thresh = 0.5
     restfile = None #default vals for optional params
     if len(sys.argv) >= 3: #assigning params if input
         if sys.argv[2] != "None":
             restfile = sys.argv[2]
-        if len(sys.argv) == 4:
+        if len(sys.argv) >= 4:
             n = int(sys.argv[3])
+        if len(sys.argv) >= 5:
+            thresh = int(sys.argv[4])
     path = sys.argv[1]
     ret = InduceC45.parser(path, restfile)
     D = ret[0]
@@ -193,7 +196,7 @@ def main():
  #1st True = is_training since doc asserts working with training file
     #2nd true is silent since we don't want outputs, should be the case
   
-    cross_ret = cross_val(D, class_var, n, True, [1])
+    cross_ret = cross_val(D, class_var, n, True, [1], thresh)
     outs = metrics(cross_ret)
     output(outs)
     write_out(path, outs)

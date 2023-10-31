@@ -9,8 +9,8 @@ if 'write' present then the program will write the json of the tree to disk unde
 classify.py: <CSVfile.csv> <tree.json> [silent]
 CSV file will be automatically determined whether it is training or not (has class variable in 3rd line) (not implemented)
 
-evaluate.py:  <TrainingSetFile.csv> [restrictionsFile.txt] [n]
-
+evaluate.py:  <TrainingSetFile.csv> [restrictionsFile.txt] [n] [thresh]
+Implements cross validation
 
 ***NOTE***
 THIS PROGRAM IS NOT COMPLETE
