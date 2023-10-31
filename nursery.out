@@ -1,0 +1,12 @@
+Predicted   recommend  priority  not_recom  very_recom  spec_prior  Col Total
+Actual                                                                       
+recommend           0         2          0           0           0          2
+priority            0      2412          0           0        1854       4266
+not_recom           0         0       4320           0           0       4320
+very_recom          0       328          0           0           0        328
+spec_prior          0      1578          0           0        2466       4044
+Row Total           0      4320       4320           0        4320      12960
+Overall Accuracy: 70.97222222222223%
+Average Accuracy: 70.97222222222223%
+{'recommend': 'Precision for recommend = 0%', 'priority': 'Precision for priority = 55.833333333333336%', 'not_recom': 'Precision for not_recom = 100.0%', 'very_recom': 'Precision for very_recom = 0%', 'spec_prior': 'Precision for spec_prior = 57.08333333333333%'}
+{'recommend': 'Recall for recommend = 0.0%', 'priority': 'Recall for priority = 56.540084388185655%', 'not_recom': 'Recall for not_recom = 100.0%', 'very_recom': 'Recall for very_recom = 0.0%', 'spec_prior': 'Recall for spec_prior = 60.97922848664689%'}

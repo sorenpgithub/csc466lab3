@@ -1,0 +1,9 @@
+Predicted     p     e  Col Total
+Actual                          
+p          3796   120       3916
+e             0  4208       4208
+Row Total  3796  4328       8124
+Overall Accuracy: 98.52289512555392%
+Average Accuracy: 98.52289512555392%
+{'p': 'Precision for p = 100.0%', 'e': 'Precision for e = 97.22735674676525%'}
+{'p': 'Recall for p = 96.93564862104188%', 'e': 'Recall for e = 100.0%'}

@@ -1,0 +1,9 @@
+Predicted  T   F  Col Total
+Actual                     
+T          5   3          8
+F          0  12         12
+Row Total  5  15         20
+Overall Accuracy: 85.0%
+Average Accuracy: 85.0%
+{'T': 'Precision for T = 100.0%', 'F': 'Precision for F = 80.0%'}
+{'T': 'Recall for T = 62.5%', 'F': 'Recall for F = 100.0%'}

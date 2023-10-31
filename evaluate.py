@@ -38,7 +38,7 @@ def cross_val(df, class_var, n, silent, forestMeta = []): #forestMeta = [numTree
         folds = np.array_split(indices, n) #k folds for cross validation
     
 
-    threshold = 0.01 #change
+    threshold = 0.5 #change
     dfs = []
     accuracies = []
     dom = df[class_var].unique()
