@@ -21,6 +21,8 @@ Implements a basic K-nearest neighbor algorithms, returning the predictied outpu
 
 ***NOTE***
 The strucutre of the functions and usage of global variables gives rise to concern as well. Overall this program needs to be cleaned up.
+randomForest needs a threshold option and the parameter needs to be tuned during the algorithm. 
+
 
 Further plans or additions:
 -Test and finalize Nocross and allbutone functionality (UNTESTED)
