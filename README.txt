@@ -10,10 +10,10 @@ classify.py: <CSVfile.csv> <tree.json> [silent]
 CSV file will be automatically determined whether it is training or not (has class variable in 3rd line) (not implemented)
 
 evaluate.py:  <TrainingSetFile.csv> [restrictionsFile.txt] [n] [thresh]
-Implements cross validation
+Implements cross validation with n folds and optional threshold input.
 
 randomForest.py: <TrainingSetFile.csv> <numAttributes> <numDataPoints> <numTrees>
-Random Forest implication with training set file. Does not consider restrictions file nor will it check numAttributes is a valid value.
+Random Forest implication with training set file. Does not consider restrictions file nor will it check numAttributes is a valid value. Will automatically output a csv file named TrainingSetFile.results.csv with just predictions.
 
 knn.py <TrainingSetFile.csv> [K]
 Implements a basic K-nearest neighbor algorithms, returning the predictied outputs along with confidence matrix and associated metrics. No default values are set and outputs will be displayed in terminal.

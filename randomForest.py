@@ -13,7 +13,7 @@ Uses pandas
 """
 def rand_data(D, class_var, numAtt, numData): #D is pandas DF, rest is defined
     df = D.sample(numData, replace = True)
-    print(df)
+    #print(df)
     cols = list(D.columns)
     cols.remove(class_var)
     newcols = random.sample(cols, numAtt)
@@ -34,7 +34,10 @@ def main():
     InduceC45.initialize_global(path, restfile, False) #may not work but needed for evaluate.crossval to run
     folds = 2 #should be fixed to 10
     conf = evaluate.cross_val(D, class_var, folds, False, [numTrees, numAttributes, numDataPoints]) #df, class_var, n, silent, numTrees
-    print(conf)
+    print(conf[0])
+    preds_df = conf[2]
+    name = str(path) + ".results.csv"
+    preds_df.to_csv(name, index=False, header = False)
 
 
 

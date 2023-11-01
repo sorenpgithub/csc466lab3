@@ -44,6 +44,7 @@ def cross_val(df, class_var, n, silent, forestMeta = [], threshold = 0.5): #fore
     test_cols = list(df.columns) #column names
     test_cols.remove(class_var) 
     i = 0 
+    totpreds_df = pd.DataFrame()
 
     for fold in folds:
         test = df.iloc[fold].reset_index(drop = True)
@@ -83,10 +84,11 @@ def cross_val(df, class_var, n, silent, forestMeta = [], threshold = 0.5): #fore
         accu = count_correct / len(y_pred) #proportion of correct
         accuracies.append(accu)
 
-
         df_confusion = pd.crosstab(y_actu, y_pred,rownames=['Actual'], colnames=['Predicted'] ) #creates crosstab
         df_confusion = df_confusion.reindex(index = dom, columns= dom, fill_value = 0) #adds extra columns even if 0
         #rint("fold", i, "\n", df_confusion)
+        pred_df.set_index(pd.Series(fold), inplace=True)
+        totpreds_df = pd.concat([totpreds_df, pred_df["mode"]], ignore_index=False)
 
         dfs.append(df_confusion)
         #train the model
@@ -102,8 +104,8 @@ def cross_val(df, class_var, n, silent, forestMeta = [], threshold = 0.5): #fore
     #result = pd.concat([result, col_tot.rename('Column Total')])
     conf_mat.loc['Row Total']= conf_mat.sum()
     conf_mat['Col Total'] = conf_mat.sum(axis=1)
-    
-    return (conf_mat, np.mean(accuracies))
+    totpreds_df.sort_index(inplace=True)
+    return (conf_mat, np.mean(accuracies), totpreds_df)
 
 
 
