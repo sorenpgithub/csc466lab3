@@ -38,7 +38,7 @@ def main():
     outs = evaluate.metrics(conf)
     evaluate.output(outs)
     preds_df = conf[2]
-    name = str(path) + ".forest.results.csv"
+    name = '.'.join(path.split(".")[:-1]) + ".forest.results.csv"
     preds_df.to_csv(name, index=False, header = False)
 
 

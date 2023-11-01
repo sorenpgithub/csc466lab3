@@ -123,7 +123,7 @@ def main():
     outs = output_stuff(D, preds, count_correct, class_var)
     for out in outs:
         sys.stdout.write(str(out) + "\n")
-    name = str(path) + ".knn.results.csv"
+    name = '.'.join(path.split(".")[:-1]) + ".knn.results.csv"
     preds = pd.Series(preds)
     preds.to_csv(name, index=False, header=False)
 

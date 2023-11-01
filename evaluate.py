@@ -2,7 +2,7 @@
 #Othilia Norell and Soren Paetau \\ onorell@calpoly.edu  / spaetau@calpoly.edu
 
 #HOW TO RUN:
-#validation.py TrainingFile.csv restrictions.txt n
+#validation.py TrainingFile.csv restrictions.txt n thresh
 
 
 
@@ -81,6 +81,7 @@ def cross_val(df, class_var, n, silent, forestMeta = [], threshold = 0.5): #fore
             count_correct = sum(mask)
         else:
             count_correct = predictions[1]
+            pred_df["mode"] = y_pred
         accu = count_correct / len(y_pred) #proportion of correct
         accuracies.append(accu)
 
@@ -164,8 +165,8 @@ def metrics(cross_ret): #(conf_matrix, mean accuracies)
 Simple write out function to path.csv \to path.out
 """
 def write_out(path, outs):
-    temp = path.split(".")[:-1]
-    name = '.'.join(temp) + "-results.out"
+    name = '.'.join(path.split(".")[:-1]) + ".results.csv"
+
     with open(name, 'w') as file:
         for out in outs:
             file.write(str(out)+ "\n")
@@ -184,7 +185,7 @@ def main():
         if len(sys.argv) >= 4:
             n = int(sys.argv[3])
         if len(sys.argv) >= 5:
-            thresh = int(sys.argv[4])
+            thresh = float(sys.argv[4])
     path = sys.argv[1]
     ret = InduceC45.parser(path, restfile)
     D = ret[0]
@@ -197,6 +198,10 @@ def main():
     cross_ret = cross_val(D, class_var, n, True, [1], thresh)
     outs = metrics(cross_ret)
     output(outs)
+    name = '.'.join(path.split(".")[:-1]) + ".eval.results.csv"
+
+    cross_ret[2].to_csv(name, index = False, header = False)
+    
     write_out(path, outs)
 
 

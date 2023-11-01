@@ -1,0 +1,9 @@
+Predicted    +    -  Col Total
+Actual                        
++          284   23        307
+-           77  306        383
+Row Total  361  329        690
+Overall Accuracy: 85.5072463768116%
+Average Accuracy: 85.5072463768116%
+{'+': 'Precision for + = 78.67036011080333%', '-': 'Precision for - = 93.00911854103343%'}
+{'+': 'Recall for + = 92.50814332247556%', '-': 'Recall for - = 79.89556135770235%'}
