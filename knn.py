@@ -109,7 +109,7 @@ def output_stuff(D, preds, correct, class_var):
 Main Function
 """
 def main():
-    ret = InduceC45.parser(sys.argv[1])
+    ret = InduceC45.parser(sys.argv[1], None)
     D = ret[0] #need to decide how to encode THIS!!
     class_var = ret[1]
     categ = ret[2]
@@ -119,7 +119,7 @@ def main():
     preds = knn(D, class_var, k, categ)
     mask = [a == b for a, b in zip(preds, D[class_var])] #gross but should work
     count_correct = sum(mask)
-    outs = classify.output_stuff(D, preds, count_correct, class_var)
+    outs = output_stuff(D, preds, count_correct, class_var)
     for out in outs:
         sys.stdout.write(str(out) + "\n")
 
