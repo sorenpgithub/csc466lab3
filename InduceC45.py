@@ -188,7 +188,7 @@ def c45(D, A, threshold, current_depth=0, max_depth=None): #going to do pandas a
   #print(D[class_var].nunique())
   
   if max_depth is not None and current_depth == max_depth:
-    print("bug")
+    #print("bug")
     T = create_node(D)
   
   #Edge case 1

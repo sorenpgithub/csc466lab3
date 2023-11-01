@@ -72,8 +72,8 @@ def cross_val(df, class_var, n, silent, forestMeta = [], threshold = 0.5): #fore
                 pred_df[col_name] = y_pred #appends prediction of Tree n to dataframe
         
         if numTrees > 1: #not needed but may be easier
-            pred_df['mode'] = pred_df.apply(find_mode, axis=1) 
-            #pred_df['mode'] = pred_df.drop("actu", axis = 1).apply(find_mode, axis=1) 
+            #pred_df['mode'] = pred_df.apply(find_mode, axis=1) 
+            pred_df['mode'] = pred_df.drop("actu", axis = 1).apply(find_mode, axis=1) 
 
             y_pred = pred_df["mode"]
             mask = [a == b for a, b in zip(y_pred, y_actu)] #gross but should work
