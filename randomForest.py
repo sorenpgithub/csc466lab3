@@ -1,14 +1,16 @@
 #python3 randomForest.py training.csv numAttribute numDatapoints numTrees
 import sys
 import pandas as pd
-import json
 import numpy as np
 import InduceC45
 import evaluate
 import random
 
 # python3 randomForest.py adult+stretch.csv 3 4 50
-
+"""
+Randomizes data based on intuitive parameters
+Uses pandas
+"""
 def rand_data(D, class_var, numAtt, numData): #D is pandas DF, rest is defined
     df = D.sample(numData, replace = True)
     print(df)

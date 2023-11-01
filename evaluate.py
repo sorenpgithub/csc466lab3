@@ -8,25 +8,25 @@
 
 import sys
 import pandas as pd
-import json
 import numpy as np
 import classify
 import InduceC45
 import randomForest
 
-"""
 
-"""
 def find_mode(row): #minor helper func
     return row.mode().iloc[0]  #will pick smallest if tied value, can be used to debug
 
+"""
+Primary cross validation function
+"""
 def cross_val(df, class_var, n, silent, forestMeta = [], threshold = 0.5): #forestMeta = [numTrees, numAtt, numData]
     numTrees = 1
     if forestMeta: #if forestMeta = [] \implies no forest
         numTrees = forestMeta[0]
 
-    indices = np.arange(df.shape[0])
-    np.random.shuffle(indices)
+    indices = np.arange(df.shape[0]) #[0,1,2....n]
+    np.random.shuffle(indices) #shuffles indices above
     nocross = False
     if n == -1:
         folds = np.array_split(indices, len(indices))
@@ -37,14 +37,12 @@ def cross_val(df, class_var, n, silent, forestMeta = [], threshold = 0.5): #fore
     else:
         folds = np.array_split(indices, n) #k folds for cross validation
     
-
-#change
+    #initializing stuff
     dfs = []
     accuracies = []
     dom = df[class_var].unique()
-    #define correct dimensions!!!!!!!
     test_cols = list(df.columns) #column names
-    test_cols.remove(class_var)
+    test_cols.remove(class_var) 
     i = 0 
 
     for fold in folds:
@@ -55,29 +53,28 @@ def cross_val(df, class_var, n, silent, forestMeta = [], threshold = 0.5): #fore
         else:
             train = df.drop(fold).reset_index(drop=True)
         #print("in fold", i)
-        y_actu = test[class_var]
-        classify.initialize_global(class_var, True, True)
-        pred_df = pd.DataFrame({"actu": y_actu})
+        y_actu = test[class_var] 
+        classify.initialize_global(class_var, True, True) #required but should be removed, makes sure classify can run properly
+        pred_df = pd.DataFrame({"actu": y_actu}) #initialize dataframe
         temptrain = train.copy()
-        for n in range(numTrees): #should be 1 if running normally
-            print(temptrain)
+        for n in range(numTrees): #should be 1 if not forest
+            #print(temptrain)
             if numTrees > 1: #AKA Forest= True
                 temptrain = randomForest.rand_data(train, class_var, forestMeta[1], forestMeta[2]) #forestMeta = [numTrees, numAtt, num]
                 test_cols = list(temptrain.columns) #column names
                 test_cols.remove(class_var)
             tree =  InduceC45.get_tree(temptrain, test_cols, threshold) #returns dict tree
-
-            #print("tree ", i, " obtained", tree)
  #1st True = is_training since doc asserts working with training file
-            predictions = classify.generate_preds(test, tree, class_var) #returns
-        #print("preds generated")
+            predictions = classify.generate_preds(test, tree, class_var) #returns predictions in list
             y_pred = pd.Series(predictions[0])
             if numTrees > 1:
                 col_name = "T" + str(n) 
-                pred_df[col_name] = y_pred
+                pred_df[col_name] = y_pred #appends prediction of Tree n to dataframe
         
         if numTrees > 1: #not needed but may be easier
-            pred_df['mode'] = pred_df.apply(find_mode, axis=1)
+            pred_df['mode'] = pred_df.apply(find_mode, axis=1) 
+            #pred_df['mode'] = pred_df.drop("actu", axis = 1).apply(find_mode, axis=1) 
+
             y_pred = pred_df["mode"]
             mask = [a == b for a, b in zip(y_pred, y_actu)] #gross but should work
             count_correct = sum(mask)
@@ -87,8 +84,8 @@ def cross_val(df, class_var, n, silent, forestMeta = [], threshold = 0.5): #fore
         accuracies.append(accu)
 
 
-        df_confusion = pd.crosstab(y_actu, y_pred,rownames=['Actual'], colnames=['Predicted'] )
-        df_confusion = df_confusion.reindex(index = dom, columns= dom, fill_value = 0)
+        df_confusion = pd.crosstab(y_actu, y_pred,rownames=['Actual'], colnames=['Predicted'] ) #creates crosstab
+        df_confusion = df_confusion.reindex(index = dom, columns= dom, fill_value = 0) #adds extra columns even if 0
         #rint("fold", i, "\n", df_confusion)
 
         dfs.append(df_confusion)
@@ -96,7 +93,7 @@ def cross_val(df, class_var, n, silent, forestMeta = [], threshold = 0.5): #fore
         i += 1
 
     conf_mat = dfs[0]
-    #print("res"+str(result)) 
+    #required since we can have one conf matrix, but will add datafreams together
     if len(dfs) > 1:
         for temp in dfs[1:]:
             conf_mat += temp
@@ -168,7 +165,6 @@ def write_out(path, outs):
     temp = path.split(".")[:-1]
     name = '.'.join(temp) + "-results.out"
     with open(name, 'w') as file:
-    # Write your output to the file
         for out in outs:
             file.write(str(out)+ "\n")
 

@@ -12,18 +12,20 @@ CSV file will be automatically determined whether it is training or not (has cla
 evaluate.py:  <TrainingSetFile.csv> [restrictionsFile.txt] [n] [thresh]
 Implements cross validation
 
-***NOTE***
-THIS PROGRAM IS NOT COMPLETE
+randomForest.py: <TrainingSetFile.csv> <numAttributes> <numDataPoints> <numTrees>
+Random Forest implication with training set file. Does not consider restrictions file nor will it check numAttributes is a valid value.
 
+knn.py <TrainingSetFile.csv> [K]
+Implements a basic K-nearest neighbor algorithms, returning the predictied outputs along with confidence matrix and associated metrics. No default values are set and outputs will be displayed in terminal.
+
+
+***NOTE***
 The strucutre of the functions and usage of global variables gives rise to concern as well. Overall this program needs to be cleaned up.
 
-Plans:
--Add f-measure and average accuracy!!
+Further plans or additions:
 -Test and finalize Nocross and allbutone functionality (UNTESTED)
 -Add information gain RATIO along with just gain
 -Further code commenting and clean up appearence
--Optimize threshold choice (currently hardcoded)
--Analyze overfitting dillema
+-Add input for threshold choice (currently hardcoded)
 -Determine whether file is training (classify)
-*
 

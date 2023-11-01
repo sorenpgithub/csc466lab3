@@ -66,8 +66,6 @@ def parser(filename,restfile = None): #utilize restfile, if no restfile assume N
  
   return (df_A, class_name, categorical)
 
-#replace with string in 3rd row of CSV WILL BE GLOBAL
-#list of categorical variables
 """
 Selects the spliiting attribute from the dataframe that with a threshold has the highest information gain
 Returns the attribute to split on
@@ -83,7 +81,7 @@ def selectSplittingAttribute(A, D, threshold): #information gain
        #appending the info gain for each attribute to a list
     else:
       print("not categ")
-      x = findBestSplit2(A_i, D)
+      x = findBestSplit(A_i, D)
       p_i = enthropy_val(x, A_i, D) #double check to make sure right entropy
     #print(p0, p_i)
     gain[i] = p0 - p_i 
@@ -95,30 +93,13 @@ def selectSplittingAttribute(A, D, threshold): #information gain
   else:
     return None
   
-  
-def findBestSplit(A_i, D): #WONT WORK
-  # c_dom = doms[class_var]
-  # k = len(c_dom)
-  # counts = [[0]] * k ##SKETCH OUT ON PAPER TO MAKE SURE VALUESS ARE RIGHT
-  # p0 = enthropy(D)
-  # df = D.sort_values(by=A_i)
-  # alpha = []
-  # gain = []
-  # for index,row in df.iterrows(): #index == l in psuedocode
-  #   alpha.append(row[A_i]) #row[A_i] = d[A_i] aka value of cont variable for that row
-  #   for j in range(k): #iterate through every class_var
-  #     if row[class_var] == c_dom[j]: #class(d) == c_j
-  #       counts[j][index] = counts[j][index - 1] + 1 #this will throw a bug when index is 0
-  #     else:
-  #       counts[j][index] = counts[j][index - 1]
-  # for index, row in df.iterrows():
-  #   counts = 0
-  #   gain.append(p0 - enthropy_val())
-  return None
 
 
 
-def findBestSplit2(A_i, D):
+"""
+Finds split with maximum gain for continuous variable A_i by iterating over all unique values
+"""
+def findBestSplit(A_i, D):
   vals = D[A_i].unique()
   gains = []
   p0 = enthropy(D)
@@ -131,6 +112,9 @@ def findBestSplit2(A_i, D):
   max_ind = gains.index(m) #finding the list index of the maximal info gain
   return vals[max_ind]
 
+"""
+Helpfer function in calculating enthropy of split at \alpha
+"""
 def enthropy_val(alpha, A_i, D):
   D_left = D[D[A_i] <= alpha]
   D_right = D[D[A_i] > alpha]
@@ -181,9 +165,6 @@ def enthropy_att(A_i, D):
     sum += pr * enthropy(D_j)
   return sum
 
-def enthropy_vals(alphas, A_i, D):
-  pass
-
 """
 Helper function for edge cases
 Constructs and returns a leaf node for a decision tree based on the most frequent class label
@@ -193,7 +174,7 @@ def create_node(D):
   r = {"leaf":{}}#create node with label of only class label STAR
   r["leaf"]["decision"] = temp[0]
   r["leaf"]["p"] = temp[1]
-  return r
+  return r #leaf with decision and prob
 
 """
 Implements the C4.5 algorithm for building a decision tree 
@@ -274,6 +255,10 @@ def get_tree(D, vars, thresh, max_depth=None):
   return tree
 
 
+
+"""
+Solely utilized due to InduceC45.py being called by other functions
+"""
 def initialize_global(path_file_in, rest_file_in, write_in = False):
   global path, rest_file, write, thresh, class_var, doms, categorical_vars#, categ_vars
   path = path_file_in
@@ -290,11 +275,17 @@ def initialize_global(path_file_in, rest_file_in, write_in = False):
   categorical_vars = ret[2]
   return(ret[0])
 
+"""
+Returns dictionary such that key is column and value is list of possible values
+Used due to cross-validation
+"""
 def dom_dict(df):
     temp = {}
     for column in df.columns:
         temp[column] = df[column].unique().tolist()
     return temp
+
+
 """
 Main function
 """

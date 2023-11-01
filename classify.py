@@ -94,7 +94,7 @@ def generate_preds(D, tree, class_var):
   return (pred, correct)
 
 """
-
+Calculates metrics and returns print friendly outputs in a list
 """
 def output_stuff(D, preds, correct, class_var):
   output = []
@@ -112,7 +112,9 @@ def output_stuff(D, preds, correct, class_var):
   output.append(df_confusion.to_string())
   return output
 
-
+"""
+More of a relic, should be removed but required when calling from evaluate.
+"""
 def initialize_global(class_var_in, training_in, silent_in = True): 
   global is_training_csv, silent
   #Dataframe with all observations, currently assuming is training set
