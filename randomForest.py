@@ -32,11 +32,13 @@ def main():
     numDataPoints = int(sys.argv[3])
     numTrees = int(sys.argv[4])
     InduceC45.initialize_global(path, restfile, False) #may not work but needed for evaluate.crossval to run
-    folds = 2 #should be fixed to 10
+    folds = 10#should be fixed to 10
     conf = evaluate.cross_val(D, class_var, folds, False, [numTrees, numAttributes, numDataPoints]) #df, class_var, n, silent, numTrees
-    print(conf[0])
+    #print(conf[0])
+    outs = evaluate.metrics(conf)
+    evaluate.output(outs)
     preds_df = conf[2]
-    name = str(path) + ".results.csv"
+    name = str(path) + ".forest.results.csv"
     preds_df.to_csv(name, index=False, header = False)
 
 

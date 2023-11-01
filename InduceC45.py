@@ -80,7 +80,7 @@ def selectSplittingAttribute(A, D, threshold): #information gain
       p_i = enthropy_att(A_i, D)
        #appending the info gain for each attribute to a list
     else:
-      print("not categ")
+      #print("not categ")
       x = findBestSplit(A_i, D)
       p_i = enthropy_val(x, A_i, D) #double check to make sure right entropy
     #print(p0, p_i)
@@ -122,7 +122,7 @@ def enthropy_val(alpha, A_i, D):
   y = D_right.shape[0] * enthropy(D_right)
   z = D.shape[0]
   sum = (x/z) + (y/z)
-  print(sum)
+  #print(sum)
   return sum
 
 """

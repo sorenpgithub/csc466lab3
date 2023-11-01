@@ -27,7 +27,7 @@ def knn(D, class_var, k, categ): #assuming D is encoded and that all cols \neq c
     for i in range(D.shape[0]):
         dists = []
         ite = 0
-        print(i)
+        #print(i)
         
         curr = D_.iloc[i].to_numpy()
         matrix = D_.drop(i).to_numpy()
@@ -81,7 +81,7 @@ def encode_df(D, categ, class_var): #convert categ to numeric and normalize nume
     # Convert all columns to float
     for col in D_dum.columns: #should use .apply() but life goes on
         D_dum[col] = pd.to_numeric(D_dum[col], errors='coerce')
-        D_dum[col] = min_max_scaling(D_dum[col])
+        #D_dum[col] = min_max_scaling(D_dum[col])
 #df = df.apply(pd.to_numeric, errors='coerce')
     return D_dum
 
@@ -109,7 +109,8 @@ def output_stuff(D, preds, correct, class_var):
 Main Function
 """
 def main():
-    ret = InduceC45.parser(sys.argv[1], None)
+    path = sys.argv[1]
+    ret = InduceC45.parser(path, None)
     D = ret[0] #need to decide how to encode THIS!!
     class_var = ret[1]
     categ = ret[2]
@@ -122,6 +123,9 @@ def main():
     outs = output_stuff(D, preds, count_correct, class_var)
     for out in outs:
         sys.stdout.write(str(out) + "\n")
+    name = str(path) + ".knn.results.csv"
+    preds = pd.Series(preds)
+    preds.to_csv(name, index=False, header=False)
 
 
 if __name__ == "__main__":
